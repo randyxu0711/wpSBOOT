@@ -1,0 +1,25 @@
+#!/bin/bash
+gene_list="/users/cn/jchang/data/yeast/2008_science-yeast1502/geneList_YeastToL.txt"
+seq_dic="../../data/aln/nucleotide_fasta/"
+aln_dic=(Clw Dca Dialign Mafft Mus Prob Tcoffee)
+concatenate_cmd="/users/cn/jchang/bin/concatenate.pl --aln"
+
+get_con_names()
+{
+        con_names=""
+	for aln in ${aln_dic[@]}
+	do
+		con_names="$con_names $seq_dic/$aln/$1.fasta"
+	done
+	echo $con_names
+}
+
+cat $gene_list|while read gene
+do
+	if [ ! -e $gene.phylip ]
+	then
+	  echo "concatenate = $gene"
+	  con_names=$(get_con_names $gene)
+	  $concatenate_cmd $con_names --out $gene.phylip
+	fi
+done

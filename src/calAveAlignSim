@@ -1,0 +1,43 @@
+#!/bin/bash
+#COMPARE_MODE=sp
+COMPARE_MODE=column
+ALN_PATH=../../data/aln/nucleotide_fasta/
+GENE_LIST=~/data/yeast/2008_science-yeast1502/geneList.txt
+aln_dic=(Clw Dca Dialign Mafft Mus Prob Tcoffee)
+num_aln=${#aln_dic[@]}
+
+echo -n "set,"
+for (( i=0; i<$num_aln; i++ ))
+do
+	echo -n ${aln_dic[$i]}.aveAlnSim,
+done
+echo -en "aveAlnSim\n"
+
+cat $GENE_LIST|while read gene
+do
+	sum_sim=0
+	tmp_array=(0 0 0 0 0 0 0)
+	for (( i=0; i<$num_aln; i++ ))
+	do
+		aln1=$ALN_PATH${aln_dic[$i]}/$gene.fasta
+		for (( j=0; j<$num_aln; j++ ))
+		do
+			aln2=$ALN_PATH${aln_dic[$j]}/$gene.fasta
+			if (( $i != $j ))
+			then
+				sim=$(t_coffee -other_pg aln_compare -al1 $aln1 -al2 $aln2 -compare_mode $COMPARE_MODE|tail -n1|awk '{print $4}')
+				sum_sim=$(echo "$sum_sim+$sim"|bc)
+				tmp_array[$i]=$(echo "${tmp_array[$i]}+$sim"|bc)
+			fi
+		done
+	done
+
+	echo -en "$gene,"
+	for (( i=0; i<$num_aln; i++ ))
+	do
+		ave=$(echo "scale=2; ${tmp_array[$i]}/($num_aln-1)"|bc)
+		echo -en "$ave,"
+	done
+	ave=$(echo "scale=2; $sum_sim/($num_aln*$num_aln-$num_aln)"|bc)
+	echo -en "$ave\n"
+done

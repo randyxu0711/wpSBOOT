@@ -1,0 +1,30 @@
+#!/bin/bash
+
+######setting#######
+#COMPARE_MODE=sp
+COMPARE_MODE=column
+ALN_PATH=../../data/aln/nucleotide_fasta/
+GENE_LIST=~/data/yeast/2008_science-yeast1502/geneList_more1yeastTree.txt
+aln_dic=(Clw Dca Dialign Mafft Mus Prob Tcoffee)
+num_aln=${#aln_dic[@]}
+result="result.csv"
+#####################################
+
+echo "gene,aln1,aln2,alnSim" > $result
+cat $GENE_LIST|while read gene
+do
+	echo "PRCOESS: $gene"
+	for (( i=0; i<$num_aln-1; i++ ))
+	do
+		aln1=$ALN_PATH${aln_dic[$i]}/$gene.fasta
+		for (( j=$i+1; j<$num_aln; j++ ))
+		do
+			aln2=$ALN_PATH${aln_dic[$j]}/$gene.fasta
+			if (( $i != $j ))
+			then
+				sim=$(t_coffee -other_pg aln_compare -al1 $aln1 -al2 $aln2 -compare_mode $COMPARE_MODE|tail -n1|awk '{print $4}')
+				echo "$gene,${aln_dic[$i]},${aln_dic[$j]},$sim" >> $result
+			fi
+		done
+	done
+done

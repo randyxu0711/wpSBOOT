@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>wpSBOOT Server</title>
+</head>
+<body>
+<div class="header">
+    <h1>wpSBOOT</h1>
+    <hr>
+</div>
+<div>
+    <h3>Alignment input</h3>
+    <form method="post" action="{{ url_for('user') }}" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <P><input type="file" name="file"></P>
+        <p>{{ form.email.label }} {{ form.email }}</p>
+        <p>{{ form.submit }}</p>
+    </form>
+</div>
+</body>
+</html>
