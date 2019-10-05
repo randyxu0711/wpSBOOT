@@ -8,7 +8,7 @@ import config
 app = Flask(__name__)
 app.config.from_object(config)
 ALLOWED_EXTENSIONS = {'txt', 'fasta'}
-cmd_list = ['perl','wpSBOOT.sh']
+cmd_list = ['perl','./src/wpSBOOT.sh']
 
 def allowed_file(filename):
     return '.' in filename and \
