@@ -1,4 +1,5 @@
 #!/bin/bash
+# Allignment tool using : mafft muscle clustalw t_coffee
 # command line : wpSBOOT.sh --infile --output --outfile
 # 2 parts : 	1. calling 4 alignment tools	2. calling concatenate
 # -- Parse option : -i for infile -o for outfile -p for path --
@@ -11,7 +12,8 @@ function usage()
 }
 
 opcount=0
-while getopts "i:o:p:?" argv
+sendmail=0
+while getopts "i:o:p:m:?" argv
 do
 	case $argv in
 		i)
@@ -59,11 +61,12 @@ function call4alntools()
 # -- Call concatenate.pl --
 function callconcat()
 {
-	perl ./src/concatenate.pl --random --aln $path/$outfile'_mafft' $path/$outfile'_muscle' $path/$outfile'_clustalw' $path/$outfile'_tcoffee' --out $outfile'_superMSA.aln'
-        mv ./$outfile'_superMSA.aln' $path       
+	perl ./src/concatenate.pl --random --aln $path/$outfile'_mafft' $path/$outfile'_muscle' $path/$outfile'_clustalw' $path/$outfile'_tcoffee' --out $outfile'_superMSA'
+        mv ./$outfile'_superMSA' $path       
 }
 
 if [ $opcount -gt 0 ]; then 
 	call4alntools 
+	wait
 	callconcat
 fi
