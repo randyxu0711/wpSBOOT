@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>wpSBOOT Server</title>
+    <link rel="icon" href="/static/icon16x_2.png" type="image/x-icon">
+    <style>
+        body{
+            font-family: "Segoe UI","Arial","Microsoft JhengHei UI";
+        }
+        .header{
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            margin: 0px;
+            height: 70px;
+            background-color: #003752;
+            box-shadow: 0px 5px 10px #444444;
+        }
+        .wrapper{
+	    position: fixed;
+	    left: 380px;
+            text-align: left;
+            width: 1200px;
+            min-height: 100%;
+            height: auto;
+            margin: 0 auto -50px;
+        }
+        .content{
+            padding-top: 5em;
+
+        }
+        .footer{
+	    position: fixed;
+	    bottom: 10px;
+            width: 1200px;
+            margin: auto;
+            color: grey;
+            font-size: 12px;
+            text-align: right;
+        }
+        h1{
+	    font-weight: normal;
+            display: inline;
+            margin: 10px 20px;
+            line-height: 65px;
+            color: #003752;
+            overflow: hidden;
+        }
+        a{
+            font-size: 15px;
+            color: #8fcc52;
+        }
+        fieldset{
+            width: auto;
+            border:0;
+            margin: 10px 20px;
+            padding: 20px;
+            margin-bottom: 10px;
+            background-color: #f4f4f4;
+        }
+        hr{
+            border-top: 3px solid gray;
+            {#border-bottom: 1px solid gray;#}
+        }
+        ul{
+            float: right;
+            display: inline;
+            margin: 0px;
+        }
+        ul li{
+            padding-left: 50px;
+            display: inline;
+            float: left;
+            line-height: 70px;
+            list-style: none;
+        }
+        ul li a{
+	    padding: 5px 10px;
+            border-radius: 14px;
+            font-weight: normal;
+            color: white;
+            text-decoration: none;
+            font-size: 20px;
+            transition: all 0.3s;
+        }
+        /*legend{
+                border-radius: 5px;
+                color: white;
+                padding: 5px 10px;
+                background-color: steelblue;
+        }*/
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body id = "page">
+<div class="wrapper">
+    <header>
+        <div class="header">
+            <div style="padding-left: 380px; width: 1180px">
+                <a href="http://www.changlabtw.com/"><img src="/static/logo_5.png" height="70"></a>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="">History</a></li>
+                    <li><a href="">Tutorial</a></li>
+                    <li><a href="{{ url_for('reference') }}">References</a></li>
+                    <li><a href="{{ url_for('contact') }}">Contacts</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <div class="content">
+            {% block main %}{% endblock %}
+    </div>
+    <div class="footer">
+        <hr>
+         2019 wpSBOOT server <br>MAIL： wpsboot@gmail.com
+    </div>
+</div>
+</body>
+</html>

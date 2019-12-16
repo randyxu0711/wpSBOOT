@@ -12,7 +12,6 @@ function usage()
 }
 
 opcount=0
-sendmail=0
 while getopts "i:o:p:m:?" argv
 do
 	case $argv in
@@ -45,14 +44,14 @@ done
 function call4alntools()
 {
 	mkdir -p $path
-	mafft $infile > $outfile'_mafft'
-	mv ./$outfile'_mafft' $path
-	muscle -in $infile -fastaout $outfile'_muscle'
-	mv ./$outfile'_muscle' $path
-	clustalw -infile=$infile -outfile=$outfile'_clustalw' -output=fasta
-	mv ./$outfile'_clustalw' $path
-	t_coffee -infile=$infile -outfile=$outfile'_tcoffee' -output=fasta
-	mv ./$outfile'_tcoffee' $path
+	mafft $infile > 'mafft.fasta'
+	mv ./'mafft.fasta' $path
+	muscle -in $infile -out 'muscle.fasta'
+	mv ./'muscle.fasta' $path
+	clustalw -infile=$infile -outfile='clustalw.fasta' -output=fasta
+	mv ./'clustalw.fasta' $path
+	t_coffee -infile=$infile -outfile='tcoffee.fasta' -output=fasta
+	mv ./'tcoffee.fasta' $path
 	rm ./$outfile'.dnd'
 }
 
@@ -61,8 +60,8 @@ function call4alntools()
 # -- Call concatenate.pl --
 function callconcat()
 {
-	perl ./src/concatenate.pl --random --aln $path/$outfile'_mafft' $path/$outfile'_muscle' $path/$outfile'_clustalw' $path/$outfile'_tcoffee' --out $outfile'_superMSA'
-        mv ./$outfile'_superMSA' $path       
+	perl ./src/concatenate.pl --random --aln $path/'mafft.fasta' $path/'muscle.fasta' $path/'clustalw.fasta' $path/'tcoffee.fasta' --out 'result.phylip'
+        mv ./'result.phylip' $path       
 }
 
 if [ $opcount -gt 0 ]; then 

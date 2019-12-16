@@ -1,22 +1,154 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>wpSBOOT Server</title>
-</head>
-<body>
-<div class="header">
-    <h1>wpSBOOT</h1>
-    <hr>
-</div>
-<div>
-    <h3>Alignment input</h3>
-    <form method="post" action="{{ url_for('user') }}" enctype="multipart/form-data">
+{% extends 'base.html' %}
+{% block head %}
+    <style>
+	label{
+	    padding-left: 20px;
+	}
+        .body_textarea{
+        }
+        .body_textarea h2{
+            color: #31261d;
+            font-style: normal;
+	    font-weight: normal;
+            padding-bottom:  20px;
+            margin: 0px;
+            margin-bottom: 20px;
+        }
+        .body_textarea small{
+            color: gray;
+            font-size: 13px;
+            font-style: italic;
+        }
+        .body_textarea label{
+            display: block;
+            color: #31261d;
+            text-align: right;
+            width: 200px;
+            float: left;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+        .seqs{
+            border: 2px #003752 solid;
+            border-radius: 5px;
+        }
+        .form-file{
+            margin: auto;
+            display: none;
+        }
+        .form-mail{
+            margin-left: 20px;
+            font-style: normal;
+            color: #31261d;
+        }
+        .form-mailbar{
+            border: 2px #003752 solid;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+        .form-submit{
+            margin-left: 45%;
+            font-size: 16px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            background: #003752;
+            border: 0 none;
+            cursor: pointer;
+            color: white;
+        }
+        .body_textarea hr{
+            display: none;
+            border-top: 2px solid gainsboro;
+            margin-bottom: 20px;
+        }
+    </style>
+{% endblock %}
+{% block main %}
+    <form method="post" action="{{ url_for('submit') }}" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
-        <P><input type="file" name="file"></P>
-        <p>{{ form.email.label }} {{ form.email }}</p>
-        <p>{{ form.submit }}</p>
+    <h1>wpSBOOT</h1><br>
+        <label style="color: #444444; font-style: italic">Incorporating alignment uncertainty into
+               Felsensteins phylogenetic bootstrap
+               to improve its reliability
+        </label>
+    <fieldset>
+        <div class="body_textarea" id="text" style="padding: 20px">
+            <h2>Sequences input
+            <br><small>Paste or upload your set of sequences in FASTA format</small>
+            </h2>
+            <div>
+                <label>
+                    Sequences to align
+                    <br>
+                    <a href="javascript:void(0)" onclick="loadexample()">clilck here to use sample file</a>
+                </label>
+                <textarea id="seqs" class="seqs" name="seqs" title="Enter the sequences to align" cols="80" rows="10"></textarea>
+            </div>
+            <label><a href="javascript:void(0)" onclick="upload_active()">upload file</a></label>
+            <br><br>
+            <p>
+                <hr id="up">
+                <input class="form-file" id="upload_file" type="file" name="file">
+            </p>
+        </div>
+    </fieldset>
+    <fieldset>
+            <div class="body_label">
+                <p>
+                    {{ form.email.label(class_="form-mail") }} {{ form.email(class_="form-mailbar") }}
+                </p>
+            </div>
+        </fieldset>
+        <div>
+            <p>
+                {{ form.submit(class_="form-submit") }}
+                <a href="{{ url_for('index') }}">
+                    <label style="font-size: 20px">
+                        reset
+                    </label>
+                </a>
+            </p>
+        </div>
     </form>
-</div>
-</body>
-</html>
+
+    <script>
+        //JavaScript code
+        function upload_active() {
+            var upf = document.getElementById('upload_file')
+            var upseqs = document.getElementById('seqs')
+			var hr = document.getElementById('up')
+
+            hr.style.display='block'
+            upf.style.display='block'
+			upseqs.value = ''
+			upseqs.setAttribute("readOnly",'true');
+
+		}
+        function loadexample() {
+            var text = document.getElementById('seqs')
+            text.value = '>seq0\n' +
+                'FQTWEEFSRAAEKLYLADPMKVRVVLKYRHVDGNLCIKVTDDLVCLVYRTDQAQDVKKIEKF\n' +
+                '>seq1\n' +
+                'KYRTWEEFTRAAEKLYQADPMKVRVVLKYRHCDGNLCIKVTDDVVCLLYRTDQAQDVKKIEKFHSQLMRLME LKVTDNKECLKFKTDQAQEAKKMEKLNNIFFTLM\n' +
+                '>seq2\n' +
+                'EEYQTWEEFARAAEKLYLTDPMKVRVVLKYRHCDGNLCMKVTDDAVCLQYKTDQAQDVKKVEKLHGK\n' +
+                '>seq3\n' +
+                'MYQVWEEFSRAVEKLYLTDPMKVRVVLKYRHCDGNLCIKVTDNSVCLQYKTDQAQDVK\n' +
+                '>seq4\n' +
+                'EEFSRAVEKLYLTDPMKVRVVLKYRHCDGNLCIKVTDNSVVSYEMRLFGVQKDNFALEHSLL\n' +
+                '>seq5\n' +
+                'SWEEFAKAAEVLYLEDPMKCRMCTKYRHVDHKLVVKLTDNHTVLKYVTDMAQDVKKIEKLTTLLMR\n' +
+                '>seq6\n' +
+                'FTNWEEFAKAAERLHSANPEKCRFVTKYNHTKGELVLKLTDDVVCLQYSTNQLQDVKKLEKLSSTLLRSI\n' +
+                '>seq7\n' +
+                'SWEEFVERSVQLFRGDPNATRYVMKYRHCEGKLVLKVTDDRECLKFKTDQAQDAKKMEKLNNIFF\n' +
+                '>seq8\n' +
+                'SWDEFVDRSVQLFRADPESTRYVMKYRHCDGKLVLKVTDNKECLKFKTDQAQEAKKMEKLNNIFFTLM\n' +
+                '>seq9\n' +
+                'KNWEDFEIAAENMYMANPQNCRYTMKYVHSKGHILLKMSDNVKCVQYRAENMPDLKK\n' +
+                '>seq10\n' +
+                'FDSWDEFVSKSVELFRNHPDTTRYVVKYRHCEGKLVLKVTDNHECLKFKTDQAQDAKKMEK'
+        }
+    </script>
+{% endblock %}
+

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block head %}
+    <style>
+        .body_result h2{
+            color: #31261d;
+            font-style: normal;
+	    font-weight: normal;
+            padding-bottom: 20px;
+            margin: auto;
+        }
+        .body_result small{
+	    font-weight: normal;
+            color: gray;
+            font-size: 13px;
+            font-style: italic;
+        }
+        .body_result hr{
+            border-top: 2px solid gainsboro;
+        }
+        a label{
+            vertical-align: 25px;
+            font-style: italic;
+            font-size: 20px;
+        }
+        .flist label{
+            padding-right: 20px;
+        }
+        table{
+            margin: 0px;
+            background: #eaf2f5;
+            color: #003752;
+            border-spacing: 0px;
+            border-collapse: collapse;
+            table-layout: fixed;
+            word-wrap: break-word;
+        }
+        td{
+            text-align: center;
+            max-width: 100px;
+            padding-left: 10px;
+            padding-right: 30px;
+        }
+        .tdhead{
+            color: #003752;
+            text-align: left;
+            padding: 10px 20px 10px 10px;
+            min-height: 32px;
+            background: lightsteelblue;
+            border-right: 1px solid #444444;
+        }
+        a{
+            font-size: 15px;
+            color: #8fcc52;
+        }
+    </style>
+{% endblock %}
+{% block main %}
+    <h1>wpSBOOT alignment result</h1>
+    <fieldset class="body_result">
+    <div style="padding: 20px">
+        <div>
+            <h2>Result files
+            <br><small>Input files with MSA files </small>
+            </h2>
+        </div>
+        <div style="margin: 20px 0px 20px 0px">
+            <table>
+            <tr>
+                <td class="tdhead">Input(s)</td>
+                <td><a href="/static/uploads/{{ filename }}" target="_blank" download="input_seqs.fasta">input_seqs</a></td>
+            </tr>
+            <tr>
+                <td class="tdhead">Mulitiple Alignment </td>
+                {% for f in flist %}
+                    {% if '.fasta' in f %}
+                        <td><a href="/static/UserData/{{ filename }}/{{ f }}" target="_blank">{{ f }}</a></td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+            <tr>
+                <td class="tdhead">super MSA</td>
+                {% for f in flist %}
+                    {% if '.phylip' in f %}
+                        <td><a href="/static/UserData/{{ filename }}/{{ f }}" target="_blank">{{ f }}</a></td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+            </table>
+        </div>
+    </div>
+    </fieldset>
+
+{% endblock %}

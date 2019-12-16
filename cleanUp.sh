@@ -1,0 +1,2 @@
+cd static
+./clean.sh

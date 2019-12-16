@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block head %}
+    <style>
+        .reference{
+            font-weight: normal;
+            padding: 20px;
+        }
+        h3{
+            font-weight: normal;
+            color: #31261d;
+        }
+    </style>
+{% endblock %}
+{% block main %}
+    <h1>What is wpSBOOT?</h1>
+    <fieldset>
+    <div class="reference">
+            <h3>&emsp;&emsp;&emsp;We demonstrate that incorporating MSA induced uncertainty into bootstrap sampling can
+    significantly increase correlation between clade correctness and its corresponding bootstrap value.
+    Our procedure involves concatenating several alternative multiple sequence alignments of the
+    same sequences, produced using different commonly used aligners. We then draw bootstrap replicates
+    while favoring columns of the more unique aligner among the concatenated aligners.
+    We named this concatenation and bootstrapping method, Weighted Partial Super Bootstrap
+    (wpSBOOT).
+                <br><br>&emsp;&emsp;&emsp;We show on three simulated datasets of 16, 32 and 64 tips that our method improves
+    the predictive power of bootstrap values. We also used as a benchmark an empirical collection of
+    853 one to one orthologous genes from seven yeast species and found wpSBOOT to significantly
+    improve discrimination capacity between topologically correct and incorrect trees. Bootstrap values
+    of wpSBOOT are comparable to similar readouts estimated using a single method. However,
+    for reduced trees by 50 and 95% bootstrap thresholds, wpSBOOT comes out the lowest Type I error
+                (less FP).
+                <br><br>
+                See the original paper here :&emsp;
+                <a href="https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btz082/5307749" target="_blank">Incorporating alignment uncertainty
+                    into Felsensteins phylogenetic bootstrap
+                    to improve its reliability
+                </a>
+            </h3>
+    </div>
+    </fieldset>
+{% endblock %}

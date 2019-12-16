@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block head %}
+    <style>
+        .contact{
+            font-weight: normal;
+            padding: 20px;
+        }
+        h2{
+            color: #31261d;
+            font-weight: normal;
+        }
+        h3{
+            color: #31261d;
+            font-weight: normal;
+        }
+        td{
+            max-width: 200px;
+            font-weight: normal;
+            font-size: 17px;
+        }
+    </style>
+{% endblock %}
+{% block main %}
+    <h1>Contacts</h1><br>
+    <fieldset>
+        <div class="contact">
+            <h2> Dr. Jia-Ming Chang 張家銘</h2>
+            <table>
+                <tr>
+                    <td>Email </td>
+                    <td>: <a href="mailto:chang.jiaming@gmail.com">chang.jiaming@gmail.com</a></td>
+                </tr>
+                <tr>
+                    <td>Home </td>
+                    <td>: <a href="http://www.changlabtw.com/">http://www.changlabtw.com/</a></td>
+                </tr>
+                <tr>
+                    <td>Phone </td>
+                    <td>: +886-2-29393091#88137 </td>
+                </tr>
+                <tr>
+                    <td>Fax </td>
+                    <td>: +886-2-22341494</td>
+                </tr>
+            </table>
+            <label>
+                <br><hr style="border-top: 2px solid gainsboro">
+                <br>11605 台北市文山區指南路二段64號 國立政治大學資訊科學系 大仁樓
+                <br>No. 64, Section 2, Zhinan Rd, Wenshan District, Taipei City, 11605, Taiwan
+                        Dep. of Computer Science, National Chengchi Uni.
+            </label>
+        </div>
+    </fieldset>
+{% endblock %}
