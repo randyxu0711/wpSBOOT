@@ -11,10 +11,7 @@
 
 ---
 ### Reference :
-[T-coffee](http://tcoffee.crg.cat/apps/tcoffee/do:regular)
-
-[twcc](https://www.twcc.ai)
-
-[ref1](https://lufficc.com/blog/how-to-serve-flask-applications-with-uwsgi-and-nginx-on-ubuntu)
-
-[ref2](https://hackmd.io/@Xpz2MX78SomsO4mV3ejdqg/SyvmmBCfX?type=view#%E6%9E%B6%E7%AB%99%EF%BC%9AuWSGI)
+1. [T-coffee](http://tcoffee.crg.cat/apps/tcoffee/do:regular)
+2. [twcc](https://www.twcc.ai)
+3. [ref1](https://lufficc.com/blog/how-to-serve-flask-applications-with-uwsgi-and-nginx-on-ubuntu)
+4. [ref2](https://hackmd.io/@Xpz2MX78SomsO4mV3ejdqg/SyvmmBCfX?type=view#%E6%9E%B6%E7%AB%99%EF%BC%9AuWSGI)
