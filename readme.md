@@ -1,19 +1,10 @@
 # wpSBOOT Sever
-* 環境建置 pip install .../requirements.txt
-*
-
----
-### TODOLIST :
-1. flask subprocess 執行 wpSBOOT.sh
-2. alignment tools options
-3. css
-4. flask-mail
-
----
-### Question :
-1. from flask_app to wpSBOOT.sh
-2. when to send email
-3. server
+* Enviroment configure: 
+  ```
+    pip install -r requirements.txt
+  ```
+* name your virtualenv as venv ,otherwise test_server.sh need to change path.
+* cleanUp.sh is used to empty your uploads ( for user uploads ) directory.
 
 ---
 ### Reference :
