@@ -1,5 +1,4 @@
 # [wpSBOOT Sever](https://wpsboot.page.link/main)
-* Web link : **(https://wpsboot.page.link/main)**
 * Intro
 
     >We demonstrate that incorporating MSA induced uncertainty into bootstrap sampling can significantly increase correlation between clade correctness and its corresponding bootstrap value. Our procedure involves concatenating several alternative multiple sequence alignments of the same sequences, produced using different commonly used aligners. We then draw bootstrap replicates while favoring columns of the more unique aligner among the concatenated aligners. We named this concatenation and bootstrapping method, Weighted Partial Super Bootstrap (wpSBOOT).
@@ -15,6 +14,7 @@
     >1. Name your *virtualenv* as venv ,otherwise ***test_server.sh need to change path***.
     >2. ***cleanUp.sh*** is used to empty your uploads ( for user uploads ) directory.
 
+* Web link : **(https://wpsboot.page.link/main)**
 ---
 
 ### Reference :
