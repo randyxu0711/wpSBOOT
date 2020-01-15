@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block head %}
+    <style>
+        table{
+            border-spacing: 0px;
+            border-collapse: collapse;
+            word-wrap: break-word;
+        }
+        table tr th{
+            padding: 3px;
+            font-weight: normal;
+            color: white;
+            text-align: center;
+            background-color: #003752;
+            min-width: 100px;
+        }
+        table tr td{
+            text-align: center;
+            background-color: #eaf2f5;
+        }
+        a{
+            text-decoration-style: dashed;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <h1>Recent jobs history</h1>
+    {% if empty == True %}
+        <label>
+            <br>No history is available for the current session.
+        </label>
+    {% else %}
+        <div>
+            <table>
+                <tr>
+                    <th>Mode</th><th>Request ID</th><th></th>
+                </tr>
+                {% for j in joblist %}
+                    <tr>
+                        <td>Super-MSA</td>
+                        <td><a href="{{ url_for('result', fid=j) }}">{{ j }}</a></td>
+                        <td><a href="">[ X ]</a>
+                    </tr>
+                {% endfor %}
+            </table>
+            <button onclick="location.href='{{ url_for('deletehistory') }}'">Delete history</button>
+        </div>
+    {% endif %}
+{% endblock %}

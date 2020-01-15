@@ -8,30 +8,36 @@
         body{
             font-family: "Segoe UI","Arial","Microsoft JhengHei UI";
         }
-        .header{
-            position: fixed;
-            left: 0;
-            top: 0;
+	.titlebg{
             width: 100%;
-            margin: 0px;
             height: 70px;
             background-color: #003752;
+            position: fixed;
+            top: 0px;
+            left: 0px;
             box-shadow: 0px 5px 10px #444444;
         }
+        header{
+            position: fixed;
+            top: 0;
+            width: 1200px;
+            margin: 0px;
+            height: 70px;
+        }
         .wrapper{
-	    position: fixed;
-	    left: 380px;
+	    position: relative;
             text-align: left;
             width: 1200px;
             min-height: 100%;
             height: auto;
-            margin: 0 auto -50px;
+	    padding 0;
+            margin: 0 auto 0px;
         }
-        .content{
-            padding-top: 5em;
-
+        main{
+            padding-top: 100px;
+	    padding-bottom: 100px;
         }
-        .footer{
+        footer{
 	    position: fixed;
 	    bottom: 10px;
             width: 1200px;
@@ -43,8 +49,8 @@
         h1{
 	    font-weight: normal;
             display: inline;
-            margin: 10px 20px;
-            line-height: 65px;
+	    padding 0;
+            margin: 0;
             color: #003752;
             overflow: hidden;
         }
@@ -55,14 +61,13 @@
         fieldset{
             width: auto;
             border:0;
-            margin: 10px 20px;
+            margin: 0;
             padding: 20px;
-            margin-bottom: 10px;
+            margin-top: 10px;
             background-color: #f4f4f4;
         }
         hr{
             border-top: 3px solid gray;
-            {#border-bottom: 1px solid gray;#}
         }
         ul{
             float: right;
@@ -85,38 +90,34 @@
             font-size: 20px;
             transition: all 0.3s;
         }
-        /*legend{
-                border-radius: 5px;
-                color: white;
-                padding: 5px 10px;
-                background-color: steelblue;
-        }*/
+        ul li a:hover{
+            background: rgba(255, 255, 255, 0.15);
+        }
     </style>
     {% block head %}{% endblock %}
 </head>
-<body id = "page">
+<body>
+<label class="titlebg"></label>
 <div class="wrapper">
     <header>
-        <div class="header">
-            <div style="padding-left: 380px; width: 1180px">
+       <div>
                 <a href="http://www.changlabtw.com/"><img src="/static/logo_5.png" height="70"></a>
                 <ul>
                     <li><a href="{{ url_for('index') }}">Home</a></li>
-                    <li><a href="">History</a></li>
+                    <li><a href="{{ url_for('history') }}">History</a></li>
                     <li><a href="">Tutorial</a></li>
                     <li><a href="{{ url_for('reference') }}">References</a></li>
                     <li><a href="{{ url_for('contact') }}">Contacts</a></li>
                 </ul>
-            </div>
-        </div>
+       </div>
     </header>
-    <div class="content">
+    <main>
             {% block main %}{% endblock %}
-    </div>
-    <div class="footer">
+    </main>
+    <footer>
         <hr>
-         2019 wpSBOOT server <br>MAIL： wpsboot@gmail.com
-    </div>
+        Developed by Randy Xu & wpSBOOT team @ 2019
+    </footer>
 </div>
 </body>
 </html>

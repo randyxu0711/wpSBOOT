@@ -9,5 +9,5 @@ from wtforms.validators import DataRequired, Email
 
 #  從繼承FlaskForm開始
 class UserForm(FlaskForm):
-    email = EmailField('Email', validators=[DataRequired(message='Not Null')])
+    email = EmailField('Email')
     submit = SubmitField('Submit')

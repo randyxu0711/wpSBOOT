@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from flask import send_from_directory
+from flask import send_from_directory, session
 from form import UserForm
 from flask_mail import Mail, Message
 import subprocess
@@ -9,6 +9,7 @@ import config
 
 app = Flask(__name__)
 app.config.from_object(config)
+app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=1)
 ALLOWED_EXTENSIONS = {'txt', 'fasta'}
 cmd_list = ['perl', './src/wpSBOOT.sh']
 basepath = os.path.dirname(__file__)
@@ -55,6 +56,32 @@ def download(fid):
     dir = fpath + fid
     return send_from_directory(dir, fid, as_attachment=True)
 
+@app.route('/history')
+def history():
+    if session.get('mail'):
+        mail = session.get('mail')
+        timeUp = datetime.datetime.now().strftime('%y%m%d%H%M%S')
+        timeDown = str(int(timeUp)-1000000)
+        path = fpath
+        listDir = os.listdir(path)
+        joblist=[]
+
+        for dir in listDir:
+            #check id
+            if mail in dir:
+                #check time
+                if mail+timeDown < dir < mail+timeUp:
+                    joblist.append(dir)
+        return render_template('history.html', empty=False, joblist=joblist)
+
+    else:
+        print('no history')
+        return render_template('history.html', empty=True)
+
+@app.route('/deletehistory')
+def deletehistory():
+    session.clear()
+    return redirect(url_for('history'))
 
 @app.route('/', methods=['POST'])
 def submit():
@@ -71,9 +98,11 @@ def submit():
         if form.validate_on_submit():
 
             # 以 email+datetime 作為filename(需唯一)
-            email = str(form.email.data)
-            filename = email.replace('.', '')+timeStr
-            #print(filename)
+            if request.form.get('email'):
+                email = str(form.email.data)
+            else:
+                email = 'test'
+            filename = email.replace('.', '') + timeStr
 
             # 處理textarea
             if request.form['seqs']:
@@ -90,6 +119,7 @@ def submit():
                 f.save(os.path.join(basepath, 'static/uploads', filename))
             else :
                 return redirect(url_for('index'))
+
             # create cmd line
             # -i input
             cmd_list.append('-i')
@@ -102,21 +132,52 @@ def submit():
             cmd_list.append('./static/UserData/'+filename)
             #print(cmd_list)
 
+            # 判斷option, aligner selector
+            opcount = 0		
+		#mafft
+            if request.form.get('mafft'):
+                cmd_list.append('-m')
+                cmd_list.append('mafft')
+                opcount += 1
+		#msucle
+            if request.form.get('muscle'):
+                cmd_list.append('-m')
+                cmd_list.append('muscle')
+                opcount += 1
+		#clustalw
+            if request.form.get('clustalw'):
+                cmd_list.append('-m')
+                cmd_list.append('clustalw')
+                opcount += 1
+		#tcoffee
+            if request.form.get('t-coffee'):
+                cmd_list.append('-m')
+                cmd_list.append('tcoffee')
+                opcount += 1
+            # if the number of aligners less than 2 (fatal error)
+            if opcount < 2:
+                return redirect(url_for('index'))
+
             # 執行 cmd line
             p = subprocess.Popen(cmd_list)
             p.communicate()
             
+            #session
+            if email != 'test':
+                session['mail'] = email.replace('.', '')
+                session.permanent = True
+
             # Mail
             link = url_for('result', fid=filename, _external=True)
             msg = Message(
                 subject='wpSBOOT alignment result',
                 recipients=[email],
-                html='Hello,<br><br>'
-                     '	Your alignment has been completed.<br>'
-                     '  click here to view your results--><a href="{link}">here</a><br><br>'
-		     'If you have questions, suggestions or to report problems do not reply to this message, write instead to '
-		     '<a href="mailto:chang.jiaming@gmail.com ">chang.jiaming@gmail.com</a><br><br>'
-                     'Cheers,<br>'
+                html='Hello,<br>'
+                     '<blockquote>Your alignment has been completed.<br>'
+                     'Please click <a href="{link}">here</a> to view your results.<br><br>'
+		     'If you have question or report problems, do not reply to this message,and write instead to '
+		     '<a href="mailto:chang.jiaming@gmail.com ">chang.jiaming@gmail.com</a></blockquote>'
+                     '<br>Cheers,<br>'
                      'wpSBOOT team'.format(link=link)
             )
             mail.send(msg)

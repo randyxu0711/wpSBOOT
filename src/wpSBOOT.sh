@@ -12,6 +12,11 @@ function usage()
 }
 
 opcount=0
+mafft=0
+muscle=0
+clustalw=0
+tcoffee=0
+
 while getopts "i:o:p:m:?" argv
 do
 	case $argv in
@@ -19,24 +24,38 @@ do
 			infile=$OPTARG
 			echo " infile name is $infile"
 			let "opcount++"
-			;;
+		;;
 		o)
 			outfile=$OPTARG
 			echo " outfile name is $outfile"
 			let "opcount++"
-			;;
+		;;
 		p)
 			path=$OPTARG
 			echo " path is $path"
 			let "opcount++"
-			;;
+		;;
+		m)
+			method=$OPTARG
+			case $method in
+				mafft)
+					let mafft=1
+				;;
+				muscle)
+					let muscle=1
+				;;
+				clustalw)
+					let muscle=1
+				;;
+				tcoffee)
+					let tcoffee=1
+				;;
+			esac	
+		;;	
 		?)
 			usage
-			#printf "\nHELP:-------------------------\n"
-			#printf "argument:\n-i for infile name\n-o for outfile name\n-p for path"	
-			#printf "\n------------------------------\n\n"
 			exit
-			;;
+		;;
 	esac	
 done
 
@@ -44,24 +63,32 @@ done
 function call4alntools()
 {
 	mkdir -p $path
-	mafft $infile > 'mafft.fasta'
-	mv ./'mafft.fasta' $path
-	muscle -in $infile -out 'muscle.fasta'
-	mv ./'muscle.fasta' $path
-	clustalw -infile=$infile -outfile='clustalw.fasta' -output=fasta
-	mv ./'clustalw.fasta' $path
-	t_coffee -infile=$infile -outfile='tcoffee.fasta' -output=fasta
-	mv ./'tcoffee.fasta' $path
-	rm ./$outfile'.dnd'
+	if [ $mafft -gt 0 ]; then
+		mafft $infile > 'mafft.fasta'
+		mv ./'mafft.fasta' $path
+	fi
+	if [ $muscle -gt 0 ]; then
+		muscle -in $infile -out 'muscle.fasta'
+		mv ./'muscle.fasta' $path
+	fi
+	if [ $clustalw -gt 0 ]; then
+		clustalw -infile=$infile -outfile='clustalw.fasta' -output=fasta
+		mv ./'clustalw.fasta' $path
+	fi
+	if [ $tcoffee -gt 0 ]; then
+		t_coffee -infile=$infile -outfile='tcoffee.fasta' -output=fasta
+		mv ./'tcoffee.fasta' $path
+		rm ./$outfile'.dnd'
+	fi
 }
-
-#call4alntools
 
 # -- Call concatenate.pl --
 function callconcat()
 {
-	perl ./src/concatenate.pl --random --aln $path/'mafft.fasta' $path/'muscle.fasta' $path/'clustalw.fasta' $path/'tcoffee.fasta' --out 'result.phylip'
-        mv ./'result.phylip' $path       
+	#perl ./src/concatenate.pl --random --aln $path/'mafft.fasta' $path/'muscle.fasta' $path/'clustalw.fasta' $path/'tcoffee.fasta' --out 'superMSA.phylip'
+        str=$path'/*.fasta'
+	perl ./src/concatenate.pl --random --aln $str --out 'superMSA.phylip'
+	mv ./'superMSA.phylip' $path       
 }
 
 if [ $opcount -gt 0 ]; then 
