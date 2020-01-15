@@ -5,9 +5,9 @@
     pip install -r requirements.txt
   ```
   
-* name your virtualenv as venv ,otherwise test_server.sh need to change path.
+1. Name your *virtualenv* as venv ,otherwise ***test_server.sh need to change path***.
 
-* cleanUp.sh is used to empty your uploads ( for user uploads ) directory.
+2. ***cleanUp.sh*** is used to empty your uploads ( for user uploads ) directory.
 
 ---
 ### Reference :
