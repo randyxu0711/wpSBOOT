@@ -19,7 +19,5 @@
 
 ### Reference :
 - see original paper : [Bioinformatics, btz082](https://doi.org/10.1093/bioinformatics/btz082)
-- web page reference :[T-coffee](http://tcoffee.crg.cat/apps/tcoffee/do:regular)
-- Guidance 
-    [Setup server](https://lufficc.com/blog/how-to-serve-flask-applications-with-uwsgi-and-nginx-on-ubuntu)  
-    [Additional](https://hackmd.io/@Xpz2MX78SomsO4mV3ejdqg/SyvmmBCfX?type=view#%E6%9E%B6%E7%AB%99%EF%BC%9AuWSGI)
+- web page reference : [T-coffee](http://tcoffee.crg.cat/apps/tcoffee/do:regular)
+- Guidance :    [Setup server](https://lufficc.com/blog/how-to-serve-flask-applications-with-uwsgi-and-nginx-on-ubuntu)  [Additional](https://hackmd.io/@Xpz2MX78SomsO4mV3ejdqg/SyvmmBCfX?type=view#%E6%9E%B6%E7%AB%99%EF%BC%9AuWSGI)
