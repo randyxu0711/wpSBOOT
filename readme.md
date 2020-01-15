@@ -1,4 +1,4 @@
-# wpSBOOT Sever
+# wpSBOOT Sever(https://wpsboot.page.link/main)
 * Web link : **[wpSBOOT](https://wpsboot.page.link/main)**
 * Intro
 
