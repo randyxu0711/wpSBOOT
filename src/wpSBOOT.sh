@@ -85,7 +85,6 @@ function call4alntools()
 # -- Call concatenate.pl --
 function callconcat()
 {
-	#perl ./src/concatenate.pl --random --aln $path/'mafft.fasta' $path/'muscle.fasta' $path/'clustalw.fasta' $path/'tcoffee.fasta' --out 'superMSA.phylip'
         str=$path'/*.fasta'
 	perl ./src/concatenate.pl --random --aln $str --out 'superMSA.phylip'
 	mv ./'superMSA.phylip' $path       
