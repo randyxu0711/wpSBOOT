@@ -2,7 +2,8 @@
 {% block title %}wpSBOOT: Super-MSA builder for phylogenetic bootstrap{% endblock %}
 {% block main %}
 <section class="hero">
-  <div class="wrap">
+  <div class="wrap hero-grid">
+    <div>
     <h1>wpSBOOT</h1>
     <p class="tagline">Incorporating alignment uncertainty into Felsenstein’s phylogenetic bootstrap.</p>
     <p class="lede">
@@ -12,6 +13,7 @@
     <div class="actions">
       <a class="button button-primary" href="#submit">Start an alignment</a>
       <a class="button button-ghost" href="https://doi.org/10.1093/bioinformatics/btz082">Read the paper</a>
+    </div>
     </div>
 
     <figure class="supermsa">
@@ -170,16 +172,14 @@
         <a href="https://doi.org/10.1093/bioinformatics/btz082">doi:10.1093/bioinformatics/btz082</a>
       </p>
       <pre class="bibtex" id="bibtex">@article{chang2021wpsboot,
-  author  = {Chang, Jia-Ming and Floden, Evan W and Herrero, Javier
-             and Gascuel, Olivier and Di Tommaso, Paolo and Notredame, Cedric},
-  title   = {Incorporating alignment uncertainty into {Felsenstein's}
-             phylogenetic bootstrap to improve its reliability},
+  author = {Chang, Jia-Ming and Floden, Evan W and Herrero, Javier and Gascuel, Olivier and Di Tommaso, Paolo and Notredame, Cedric},
+  title = {Incorporating alignment uncertainty into {Felsenstein's} phylogenetic bootstrap to improve its reliability},
   journal = {Bioinformatics},
-  volume  = {37},
-  number  = {11},
-  pages   = {1506--1514},
-  year    = {2021},
-  doi     = {10.1093/bioinformatics/btz082}
+  volume = {37},
+  number = {11},
+  pages = {1506--1514},
+  year = {2021},
+  doi = {10.1093/bioinformatics/btz082}
 }</pre>
       <p><button type="button" class="link-button" id="copy-bibtex">Copy BibTeX</button> <span id="copy-status" aria-live="polite"></span></p>
     </div>

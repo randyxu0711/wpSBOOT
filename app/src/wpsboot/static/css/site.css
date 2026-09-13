@@ -70,6 +70,8 @@ code, pre, textarea.sequences { font-family: var(--mono); }
 }
 .nav a:hover { background: rgb(255 255 255 / 0.12); color: #fff; }
 @media (max-width: 720px) {
+  .topbar { position: static; }
+  html { scroll-padding-top: 0; }
   .topbar .wrap { flex-direction: column; align-items: flex-start; gap: 4px; padding-block: 10px; }
   .brand img { height: 32px; }
   .nav { margin-left: -10px; }
@@ -85,19 +87,21 @@ code, pre, textarea.sequences { font-family: var(--mono); }
 .hero .tagline { margin: 14px 0 0; max-width: 40ch; font-size: clamp(18px, 2.4vw, 22px); color: #cfe0e8; }
 .hero .lede { margin: 18px 0 0; max-width: var(--measure); color: #a9c3cf; }
 .hero .actions { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 12px; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; align-items: center; }
+@media (min-width: 1040px) { .hero-grid { grid-template-columns: minmax(0, 1fr) max-content; gap: 48px; } }
 
 /* The Super-MSA strip: four alignments of the same sequences, concatenated. */
-.supermsa { margin-top: 40px; }
+.supermsa { margin: 0; min-width: 0; }
 .supermsa-rows {
   display: grid; grid-auto-flow: column; grid-template-columns: repeat(4, max-content);
   gap: 0 3px; overflow-x: auto; padding-bottom: 6px;
-  font: 13px/1.45 var(--mono);
+  font: 14px/1.5 var(--mono);
 }
 .segment { padding: 8px 10px; border-top: 4px solid var(--seg); background: rgb(255 255 255 / 0.04); }
 .segment pre { margin: 0; font: inherit; color: #d9e7ee; }
 .segment pre .gap { color: rgb(255 255 255 / 0.28); }
 .segment .seg-name { display: block; margin-bottom: 4px; font: 600 12px/1.2 var(--sans); color: var(--seg); }
-.supermsa figcaption { margin-top: 10px; font-size: 14px; color: #a9c3cf; max-width: var(--measure); }
+.supermsa figcaption { margin-top: 10px; font-size: 14px; color: #a9c3cf; max-width: 46ch; }
 @media (prefers-reduced-motion: no-preference) {
   .segment { animation: join 700ms cubic-bezier(.2, .7, .2, 1) both; }
   .segment:nth-child(2) { animation-delay: 90ms; }
@@ -135,7 +139,7 @@ code, pre, textarea.sequences { font-family: var(--mono); }
 @media (max-width: 900px) { .submit-grid { grid-template-columns: minmax(0, 1fr); } }
 
 .panel { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
-.panel + .panel { margin-top: 16px; }
+.submit-grid .panel + .panel { margin-top: 16px; }
 .panel h3 { margin: 0 0 4px; font-size: 18px; }
 .panel .hint { margin: 0 0 12px; font-size: 14px; color: var(--slate); }
 
@@ -229,6 +233,7 @@ table.data td.num { text-align: right; font-variant-numeric: tabular-nums; }
 pre.bibtex {
   margin: 0; padding: 14px; overflow-x: auto; background: var(--navy-deep); color: #d9e7ee;
   border-radius: var(--radius); font-size: 13px; line-height: 1.5;
+  white-space: pre-wrap; overflow-wrap: anywhere;
 }
 .contact dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 12px 0; }
 .contact dt { color: var(--slate); }
@@ -289,6 +294,8 @@ address { font-style: normal; color: var(--slate); }
 .admin-banner { background: var(--danger); color: #fff; padding: 10px 0; font-weight: 600; }
 .admin-main { padding-block: 28px 56px; }
 .admin-main h1 { margin: 0 0 16px; color: var(--navy); }
+.admin-main h2 { margin: 28px 0 12px; color: var(--navy); }
+.admin-main h1.mono { font-size: clamp(18px, 3vw, 26px); word-break: break-all; }
 .stat-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
 .stat { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 16px; min-width: 120px; }
 .stat b { display: block; font-size: 24px; font-variant-numeric: tabular-nums; }

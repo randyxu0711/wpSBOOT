@@ -54,15 +54,15 @@ def test_all_aligners_and_concatenate(tmp_path: Path) -> None:
 
     header = phylip.splitlines()[0].split()
     assert header[0] == "11"
-    lengths = {
-        aligner: sum(
-            len(line.strip())
-            for line in (tmp_path / ALIGNERS[aligner].output_file).read_text().split(">")[1].splitlines()[1:]
-        )
-        for aligner in ALIGNERS
-    }
     # The Super-MSA is every alignment laid end to end.
-    assert int(header[1]) == sum(lengths.values())
+    assert int(header[1]) == sum(
+        alignment_length(tmp_path / a.output_file) for a in ALIGNERS.values()
+    )
+
+
+def alignment_length(path: Path) -> int:
+    first_record = path.read_text().split(">")[1]
+    return sum(len(line.strip()) for line in first_record.splitlines()[1:])
 
 
 def test_phylip_truncates_names_to_ten_characters(tmp_path: Path) -> None:

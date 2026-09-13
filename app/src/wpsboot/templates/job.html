@@ -10,7 +10,7 @@
       <div><dt>Sequences</dt><dd>{{ job.sequence_count }}</dd></div>
       <div><dt>Residues</dt><dd>{{ "{:,}".format(job.total_residues) }}</dd></div>
       <div><dt>Submitted</dt><dd><time data-local datetime="{{ job.created_at }}">{{ job.created_at[:16].replace('T', ' ') }} UTC</time></dd></div>
-      <div id="expires-row"><dt>Deleted after</dt><dd><time data-local datetime="{{ job.expires_at }}">{{ job.expires_at[:16].replace('T', ' ') }} UTC</time></dd></div>
+      <div id="expires-row"><dt>Kept until</dt><dd><time data-local datetime="{{ job.expires_at }}">{{ job.expires_at[:16].replace('T', ' ') }} UTC</time></dd></div>
     </dl>
   </div>
 </section>
