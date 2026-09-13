@@ -1,0 +1,38 @@
+# Local development overrides, applied automatically by `docker compose up`.
+# For production use: docker compose -f compose.yaml up -d
+services:
+  db:
+    ports:
+      - "127.0.0.1:55432:5432"
+
+  web:
+    command: ["uvicorn", "--factory", "wpsboot.main:create_app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "/opt/wpsboot/app/src"]
+    environment:
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      SMTP_SECURITY: none
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app/src:/opt/wpsboot/app/src:ro
+
+  worker:
+    deploy:
+      replicas: 1
+    environment:
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      SMTP_SECURITY: none
+    volumes:
+      - ./app/src:/opt/wpsboot/app/src:ro
+
+  mailpit:
+    image: axllent/mailpit:v1.20
+    ports:
+      - "8025:8025"
+
+  caddy:
+    profiles: ["proxy"]
+
+  backup:
+    profiles: ["backup"]

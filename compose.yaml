@@ -1,0 +1,131 @@
+# Production stack. Configure through .env (copy .env.example), then: docker compose up -d
+name: wpsboot
+
+x-app: &app
+  env_file: .env
+  environment:
+    DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-wpsboot}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/${POSTGRES_DB:-wpsboot}
+    DATA_DIR: /data/jobs
+  volumes:
+    - jobdata:/data/jobs
+  restart: unless-stopped
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "5" }
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-wpsboot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-wpsboot}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  migrate:
+    <<: *app
+    image: wpsboot-web:${WPSBOOT_VERSION:-latest}
+    build: { context: ., dockerfile: docker/Dockerfile, target: web }
+    command: ["alembic", "upgrade", "head"]
+    restart: "no"
+    depends_on:
+      db: { condition: service_healthy }
+
+  web:
+    <<: *app
+    image: wpsboot-web:${WPSBOOT_VERSION:-latest}
+    build: { context: ., dockerfile: docker/Dockerfile, target: web }
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=4)"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  worker:
+    <<: *app
+    image: wpsboot-worker:${WPSBOOT_VERSION:-latest}
+    build: { context: ., dockerfile: docker/Dockerfile, target: worker }
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    deploy:
+      replicas: ${WORKER_REPLICAS:-2}
+      resources:
+        limits: { cpus: "${WORKER_CPUS:-2}", memory: "${WORKER_MEMORY:-4g}" }
+    stop_grace_period: 30s
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os, sys, time; sys.exit(time.time() - os.path.getmtime('/tmp/wpsboot-worker-alive') > 60)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  caddy:
+    image: caddy:2.8-alpine
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      web: { condition: service_healthy }
+    restart: unless-stopped
+
+  backup:
+    image: postgres:16-alpine
+    environment:
+      PGHOST: db
+      PGUSER: ${POSTGRES_USER:-wpsboot}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      PGDATABASE: ${POSTGRES_DB:-wpsboot}
+      BACKUP_KEEP: ${BACKUP_KEEP:-7}
+    volumes:
+      - backups:/backups
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        while true; do
+          file=/backups/wpsboot-$$(date -u +%Y%m%dT%H%M%SZ).sql.gz
+          if pg_dump --no-owner | gzip > "$$file.partial"; then
+            mv "$$file.partial" "$$file" && echo "backup written: $$file"
+          else
+            rm -f "$$file.partial"; echo "backup FAILED" >&2
+          fi
+          ls -1t /backups/wpsboot-*.sql.gz 2>/dev/null | tail -n +$$((BACKUP_KEEP + 1)) | xargs -r rm -f
+          sleep 86400
+        done
+    depends_on:
+      db: { condition: service_healthy }
+    restart: unless-stopped
+
+  # Test runner: docker compose --profile test run --rm test
+  test:
+    image: wpsboot-test:local
+    build: { context: ., dockerfile: docker/Dockerfile, target: test }
+    profiles: ["test"]
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-wpsboot}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/wpsboot_test
+      SECRET_KEY: test-secret
+    depends_on:
+      db: { condition: service_healthy }
+
+volumes:
+  pgdata:
+  jobdata:
+  caddy_data:
+  caddy_config:
+  backups:

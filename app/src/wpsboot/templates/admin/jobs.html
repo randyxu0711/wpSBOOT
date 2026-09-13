@@ -1,0 +1,80 @@
+{% extends "admin/base.html" %}
+{% block title %}Admin: jobs · wpSBOOT{% endblock %}
+{% block main %}
+<div class="wrap admin-main">
+  <h1>Jobs</h1>
+
+  <div class="stat-row">
+    <div class="stat"><b>{{ stats.created_24h }}</b><span>submitted, 24 h</span></div>
+    <div class="stat"><b>{{ stats.created_7d }}</b><span>submitted, 7 days</span></div>
+    <div class="stat"><b>{{ stats.created_30d }}</b><span>submitted, 30 days</span></div>
+    {% for name in ["queued", "running", "failed"] %}
+    <div class="stat"><b>{{ stats.by_status.get(name, 0) }}</b><span>{{ name }} now</span></div>
+    {% endfor %}
+  </div>
+
+  {% if stats.step_stats %}
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th scope="col">Step</th><th scope="col">Runs</th><th scope="col">Succeeded</th><th scope="col">Failed or timed out</th><th scope="col">Average time</th></tr></thead>
+      <tbody>
+        {% for row in stats.step_stats %}
+        <tr>
+          <td>{{ labels.get(row.name, row.name) }}</td>
+          <td class="num">{{ row.runs }}</td>
+          <td class="num">{{ row.succeeded }}</td>
+          <td class="num">{{ row.failed }}</td>
+          <td class="num">{% if row.avg_seconds is not none %}{{ "%.1f" % row.avg_seconds }} s{% else %}–{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <form class="filters" method="get" action="{{ url_for('admin_jobs') }}">
+    <label>Status
+      <select name="status">
+        <option value="">Any</option>
+        {% for s in statuses %}<option value="{{ s.value }}" {% if status == s %}selected{% endif %}>{{ s.value }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Job ID starts with
+      <input name="q" value="{{ q }}" maxlength="36" spellcheck="false" autocomplete="off">
+    </label>
+    <button class="button button-outline" type="submit">Filter</button>
+  </form>
+
+  <p>{{ total }} job{{ "" if total == 1 else "s" }}</p>
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr><th scope="col">Job</th><th scope="col">Status</th><th scope="col">Submitted (UTC)</th><th scope="col">Sequences</th><th scope="col">Aligners</th><th scope="col">Runtime</th><th scope="col">Worker</th></tr>
+      </thead>
+      <tbody>
+        {% for job in jobs %}
+        <tr>
+          <td><a class="mono" href="{{ url_for('admin_job', job_id=job.id) }}">{{ (job.id|string)[:8] }}</a></td>
+          <td><span class="status status-{{ job.status.value }}">{{ job.status.value }}</span></td>
+          <td>{{ job.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+          <td class="num">{{ job.seq_count }}</td>
+          <td>{{ job.aligners | step_labels }}</td>
+          <td class="num">{% if job.started_at and job.finished_at %}{{ "%.0f" % (job.finished_at - job.started_at).total_seconds() }} s{% else %}–{% endif %}</td>
+          <td class="mono">{{ job.locked_by or "" }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7">No jobs match these filters.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if pages > 1 %}
+  <nav class="pager" aria-label="Pages">
+    {% if page > 1 %}<a href="?status={{ status.value if status else '' }}&q={{ q | urlencode }}&page={{ page - 1 }}">Previous</a>{% endif %}
+    <span>Page {{ page }} of {{ pages }}</span>
+    {% if page < pages %}<a href="?status={{ status.value if status else '' }}&q={{ q | urlencode }}&page={{ page + 1 }}">Next</a>{% endif %}
+  </nav>
+  {% endif %}
+</div>
+{% endblock %}

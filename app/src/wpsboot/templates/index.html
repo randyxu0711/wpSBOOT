@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% block title %}wpSBOOT: Super-MSA builder for phylogenetic bootstrap{% endblock %}
+{% block main %}
+<section class="hero">
+  <div class="wrap">
+    <h1>wpSBOOT</h1>
+    <p class="tagline">Incorporating alignment uncertainty into Felsenstein’s phylogenetic bootstrap.</p>
+    <p class="lede">
+      Align your sequences with several aligners and download the concatenated Super-MSA,
+      ready for weighted partial super bootstrap analysis.
+    </p>
+    <div class="actions">
+      <a class="button button-primary" href="#submit">Start an alignment</a>
+      <a class="button button-ghost" href="https://doi.org/10.1093/bioinformatics/btz082">Read the paper</a>
+    </div>
+
+    <figure class="supermsa">
+      <div class="supermsa-rows">
+        {% for segment in hero_segments %}
+        <div class="segment" style="--seg: var(--c-{{ segment.id }}); --i: {{ loop.index }}">
+          <span class="seg-name">{{ segment.label }}</span>
+          <pre>{% for row in segment.rows %}{% for ch in row %}{% if ch == '-' %}<span class="gap">-</span>{% else %}{{ ch }}{% endif %}{% endfor %}
+{% endfor %}</pre>
+        </div>
+        {% endfor %}
+      </div>
+      <figcaption>
+        A slice of the sample sequences as aligned by each tool, joined side by side:
+        that is a Super-MSA.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="section" id="submit" aria-labelledby="submit-title">
+  <div class="wrap">
+    <h2 id="submit-title">Build a Super-MSA</h2>
+    <p class="intro">
+      Paste or upload unaligned protein or nucleotide sequences in FASTA format:
+      {{ settings.max_sequences }} sequences at most, up to {{ "{:,}".format(settings.max_sequence_length) }} residues each.
+    </p>
+
+    <form id="submit-form" action="/api/v1/jobs" method="post" enctype="multipart/form-data" novalidate
+          data-max-upload-bytes="{{ settings.max_upload_bytes }}" data-min-aligners="{{ min_aligners }}">
+      <div id="form-errors" class="alert alert-error" role="alert" tabindex="-1" hidden></div>
+      <div class="submit-grid">
+        <div class="panel">
+          <div class="input-tabs" role="tablist">
+            <button type="button" role="tab" id="tab-paste" aria-controls="pane-paste" aria-selected="true">Paste sequences</button>
+            <button type="button" role="tab" id="tab-upload" aria-controls="pane-upload" aria-selected="false">Upload a file</button>
+          </div>
+          <div id="pane-paste" role="tabpanel" aria-labelledby="tab-paste">
+            <label class="visually-hidden" for="sequences">Sequences in FASTA format</label>
+            <textarea class="sequences" id="sequences" name="sequences" spellcheck="false" autocomplete="off"
+                      placeholder="&gt;seq1&#10;MKVLAAGIVALLLA...&#10;&gt;seq2&#10;MKVLSAGIVGLLLA..."></textarea>
+            <div class="input-meta">
+              <button type="button" class="link-button" id="load-example">Load sample sequences</button>
+              <span id="sequence-count" aria-live="polite"></span>
+            </div>
+            <template id="example-fasta">{{ example_fasta }}</template>
+          </div>
+          <div id="pane-upload" role="tabpanel" aria-labelledby="tab-upload" hidden>
+            <label class="dropzone" id="dropzone">
+              <strong>Choose a FASTA file</strong>
+              <span>or drop it here. Plain text, up to {{ "%g" % max_upload_mb }} MB.</span>
+              <input type="file" id="file" name="file" accept=".fasta,.fa,.faa,.fna,.fas,.txt,text/plain">
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <fieldset class="panel">
+            <legend class="visually-hidden">Aligners</legend>
+            <h3>Aligners</h3>
+            <p class="hint">Choose at least {{ min_aligners }}. Each one adds its own alignment to the Super-MSA.</p>
+            <ul class="aligner-list">
+              {% for aligner in aligners %}
+              <li>
+                <label class="aligner-option" style="--seg: var(--c-{{ aligner.id }})">
+                  <input type="checkbox" name="aligners" value="{{ aligner.id }}" checked>
+                  <span class="name">{{ aligner.label }}</span>
+                </label>
+              </li>
+              {% endfor %}
+            </ul>
+          </fieldset>
+
+          {% if settings.mail_enabled %}
+          <div class="panel field">
+            <label for="email">Email <span class="hint">(optional)</span></label>
+            <p class="hint">We send one message with the link to your results, then delete the address.</p>
+            <input type="email" id="email" name="email" autocomplete="email" inputmode="email">
+          </div>
+          {% endif %}
+
+          <div class="submit-row">
+            <button class="button button-primary" type="submit" id="submit-button">Build Super-MSA</button>
+            <p class="fine-print">
+              Results are kept for {{ settings.retention_days }} days, then deleted.
+              Your sequences are not shared or used for anything else.
+            </p>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section class="section" id="how" aria-labelledby="how-title">
+  <div class="wrap">
+    <h2 id="how-title">How to use</h2>
+    <p class="intro">Most jobs finish within a few minutes. You don’t need an account.</p>
+    <ol class="steps">
+      <li>
+        <h3>Add your sequences</h3>
+        <p>Paste FASTA or upload a file. Keep names unique within their first 10 characters: the PHYLIP output only keeps 10.</p>
+      </li>
+      <li>
+        <h3>Pick the aligners</h3>
+        <p>Every selected aligner aligns your sequences independently, all at the same time. The alignments are then concatenated in random order.</p>
+      </li>
+      <li>
+        <h3>Download the Super-MSA</h3>
+        <p>The result page updates on its own. Download each alignment, <code>superMSA.phylip</code>, or everything as a zip. Bookmark the page: its link is the only way back to your results.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="section" id="recent" aria-labelledby="recent-title">
+  <div class="wrap">
+    <h2 id="recent-title">Your recent jobs</h2>
+    <p class="intro">Jobs submitted from this browser. The list is stored only on this device.</p>
+    <p id="recent-empty">No jobs yet. Submitted jobs will appear here.</p>
+    <div class="table-wrap" id="recent-table" hidden>
+      <table class="data">
+        <thead><tr><th scope="col">Submitted</th><th scope="col">Sequences</th><th scope="col">Status</th><th scope="col">Job</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="about" aria-labelledby="about-title">
+  <div class="wrap two-col">
+    <div class="prose">
+      <h2 id="about-title">About wpSBOOT</h2>
+      <p>
+        Incorporating the uncertainty induced by multiple sequence alignment into bootstrap sampling
+        can significantly increase the correlation between clade correctness and its bootstrap value.
+        The procedure concatenates several alternative alignments of the same sequences, produced by
+        different commonly used aligners, then draws bootstrap replicates while favouring columns of
+        the more unique aligners. This concatenation and bootstrapping method is called Weighted
+        Partial Super Bootstrap (wpSBOOT).
+      </p>
+      <p>
+        On simulated datasets of 16, 32 and 64 tips, and on 853 one-to-one orthologous genes from
+        seven yeast species, wpSBOOT improved the discrimination between topologically correct and
+        incorrect trees. For trees reduced at 50% and 95% bootstrap thresholds it gives the lowest
+        Type I error (fewest false positives).
+      </p>
+      <p>This server builds the Super-MSA, the first stage of the method.</p>
+    </div>
+    <div>
+      <h2 id="cite">How to cite</h2>
+      <p class="citation">
+        Chang J-M, Floden EW, Herrero J, Gascuel O, Di Tommaso P, Notredame C.
+        Incorporating alignment uncertainty into Felsenstein’s phylogenetic bootstrap to improve its reliability.
+        <i>Bioinformatics</i> 37(11):1506–1514, 2021.
+        <a href="https://doi.org/10.1093/bioinformatics/btz082">doi:10.1093/bioinformatics/btz082</a>
+      </p>
+      <pre class="bibtex" id="bibtex">@article{chang2021wpsboot,
+  author  = {Chang, Jia-Ming and Floden, Evan W and Herrero, Javier
+             and Gascuel, Olivier and Di Tommaso, Paolo and Notredame, Cedric},
+  title   = {Incorporating alignment uncertainty into {Felsenstein's}
+             phylogenetic bootstrap to improve its reliability},
+  journal = {Bioinformatics},
+  volume  = {37},
+  number  = {11},
+  pages   = {1506--1514},
+  year    = {2021},
+  doi     = {10.1093/bioinformatics/btz082}
+}</pre>
+      <p><button type="button" class="link-button" id="copy-bibtex">Copy BibTeX</button> <span id="copy-status" aria-live="polite"></span></p>
+    </div>
+  </div>
+</section>
+
+<section class="section contact" id="contact" aria-labelledby="contact-title">
+  <div class="wrap">
+    <h2 id="contact-title">Contact</h2>
+    <p class="intro">Questions about the method or problems with the server: write to the lab.</p>
+    <h3>Dr. Jia-Ming Chang 張家銘</h3>
+    <dl>
+      <dt>Email</dt><dd><a href="mailto:chang.jiaming@gmail.com">chang.jiaming@gmail.com</a></dd>
+      <dt>Lab</dt><dd><a href="http://www.changlabtw.com/">www.changlabtw.com</a></dd>
+      <dt>Phone</dt><dd>+886-2-29393091 ext. 88137</dd>
+    </dl>
+    <address>
+      Department of Computer Science, National Chengchi University<br>
+      No. 64, Section 2, Zhinan Rd, Wenshan District, Taipei City 11605, Taiwan<br>
+      <span lang="zh-Hant">11605 台北市文山區指南路二段64號 國立政治大學資訊科學系 大仁樓</span>
+    </address>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', path='js/recent.js') }}" defer></script>
+<script src="{{ url_for('static', path='js/submit.js') }}" defer></script>
+{% endblock %}

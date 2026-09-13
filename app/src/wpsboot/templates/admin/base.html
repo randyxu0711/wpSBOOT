@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block banner %}
+{% if settings.admin_uses_default_password %}
+<div class="admin-banner" role="alert">
+  <div class="wrap">The admin panel is using the default admin/admin password. Set ADMIN_USERNAME and ADMIN_PASSWORD in .env and restart.</div>
+</div>
+{% endif %}
+{% endblock %}
+{% block nav %}
+<a href="{{ url_for('admin_jobs') }}">Jobs</a>
+<a href="/">Public site</a>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', path='js/admin.js') }}" defer></script>{% endblock %}

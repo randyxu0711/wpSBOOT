@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Job {{ job.id[:8] }} · wpSBOOT{% endblock %}
+{% block main %}
+<section class="job-head">
+  <div class="wrap">
+    <h1 id="job-title">Super-MSA job</h1>
+    <p class="job-id mono">{{ job.id }}</p>
+    <span id="job-status" class="status status-{{ job.status }}">{{ job.status }}</span>
+    <dl class="job-summary">
+      <div><dt>Sequences</dt><dd>{{ job.sequence_count }}</dd></div>
+      <div><dt>Residues</dt><dd>{{ "{:,}".format(job.total_residues) }}</dd></div>
+      <div><dt>Submitted</dt><dd><time data-local datetime="{{ job.created_at }}">{{ job.created_at[:16].replace('T', ' ') }} UTC</time></dd></div>
+      <div id="expires-row"><dt>Deleted after</dt><dd><time data-local datetime="{{ job.expires_at }}">{{ job.expires_at[:16].replace('T', ' ') }} UTC</time></dd></div>
+    </dl>
+  </div>
+</section>
+
+<div class="wrap job-body">
+  <div id="job-message" role="status" aria-live="polite"></div>
+
+  <section aria-labelledby="progress-title">
+    <h2 id="progress-title">Progress</h2>
+    <div class="pipeline">
+      <div class="parallel" id="aligner-steps"></div>
+      <div class="join" aria-hidden="true"></div>
+      <div id="concat-step"></div>
+    </div>
+  </section>
+
+  <section id="order-section" aria-labelledby="order-title" hidden>
+    <h2 id="order-title">Concatenation order</h2>
+    <div class="order-bar" id="order-bar"></div>
+    <p class="order-note">
+      concatenate.pl joined the alignments left to right in this random order. Column ranges in
+      <code>superMSA.phylip</code> follow the same order.
+    </p>
+  </section>
+
+  <section id="files-section" aria-labelledby="files-title" hidden>
+    <h2 id="files-title">Results</h2>
+    <div class="files-actions">
+      <a class="button button-primary" id="archive-link" href="#">Download all (.zip)</a>
+    </div>
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th scope="col">File</th><th scope="col">Contents</th><th scope="col">Size</th></tr></thead>
+        <tbody id="files-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="details-title">
+    <h2 id="details-title">Details</h2>
+    <div class="details-grid">
+      <div class="panel">
+        <h3>Aligners</h3>
+        <dl class="kv" id="aligner-details"></dl>
+      </div>
+      <div class="panel">
+        <h3>Tool versions</h3>
+        <dl class="kv" id="version-details"><dt>Status</dt><dd>Recorded when the job starts.</dd></dl>
+      </div>
+      <div class="panel">
+        <h3>Delete this job</h3>
+        <p class="hint">Stops the job if it is still running and removes your sequences and results now.</p>
+        <button type="button" class="button button-danger" id="delete-job">Delete job and files</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script type="application/json" id="job-data">{{ job | tojson }}</script>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', path='js/recent.js') }}" defer></script>
+<script src="{{ url_for('static', path='js/job.js') }}" defer></script>
+{% endblock %}

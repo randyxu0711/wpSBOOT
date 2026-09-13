@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}wpSBOOT{% endblock %}</title>
+  <meta name="description" content="Build a Super-MSA from several multiple sequence aligners for weighted partial super bootstrap (wpSBOOT).">
+  <link rel="icon" href="{{ url_for('static', path='img/favicon.png') }}" type="image/png">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/site.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  {% block banner %}{% endblock %}
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="http://www.changlabtw.com/" aria-label="Chang Lab website">
+        <img src="{{ url_for('static', path='img/logo.png') }}" alt="Chang Lab TW" width="1240" height="295">
+      </a>
+      <nav class="nav" aria-label="Main">
+        {% block nav %}
+        <a href="/#submit">Submit</a>
+        <a href="/#how">How to use</a>
+        <a href="/#recent">Recent jobs</a>
+        <a href="/#about">About &amp; cite</a>
+        <a href="/#contact">Contact</a>
+        {% endblock %}
+      </nav>
+    </div>
+  </header>
+  <main id="main">
+    {% block main %}{% endblock %}
+  </main>
+  <footer class="footer">
+    <div class="wrap">
+      <span>wpSBOOT is developed by Chang Lab, National Chengchi University.</span>
+      <span><a href="/api/docs">API documentation</a></span>
+    </div>
+  </footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

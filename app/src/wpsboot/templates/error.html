@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Page not found · wpSBOOT{% endblock %}
+{% block main %}
+<div class="wrap error-page">
+  <h1>{% if status_code == 404 %}This page doesn’t exist{% else %}This request isn’t supported{% endif %}</h1>
+  <p>
+    If you followed a link to a job, it may have been deleted, or its files were removed after the
+    retention period.
+  </p>
+  <p><a class="button button-outline" href="/#submit">Submit new sequences</a></p>
+</div>
+{% endblock %}

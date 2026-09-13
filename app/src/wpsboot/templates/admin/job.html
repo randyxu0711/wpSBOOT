@@ -1,0 +1,84 @@
+{% extends "admin/base.html" %}
+{% block title %}Admin: job {{ (job.id|string)[:8] }} · wpSBOOT{% endblock %}
+{% block main %}
+<div class="wrap admin-main">
+  <p><a href="{{ url_for('admin_jobs') }}">All jobs</a></p>
+  <h1 class="mono">{{ job.id }}</h1>
+  <span class="status status-{{ job.status.value }}">{{ job.status.value }}</span>
+  {% if job.cancel_requested_at %}<span class="status status-cancelled">{{ job.cancel_action.value }} requested</span>{% endif %}
+
+  <div class="admin-actions">
+    {% if job.status.value in ("queued", "running", "succeeded", "failed") %}
+    <a class="button button-outline" href="{{ url_for('job_page', job_id=job.id) }}">Open public page</a>
+    {% endif %}
+    {% if job.status.value in ("queued", "running") %}
+    <form method="post" action="{{ url_for('admin_cancel', job_id=job.id) }}">
+      <button class="button button-outline" type="submit">Cancel job</button>
+    </form>
+    {% endif %}
+    {% if job.status.value == "failed" %}
+    <form method="post" action="{{ url_for('admin_requeue', job_id=job.id) }}">
+      <button class="button button-outline" type="submit">Run again</button>
+    </form>
+    {% endif %}
+    {% if job.status.value not in ("deleted",) %}
+    <form method="post" action="{{ url_for('admin_delete', job_id=job.id) }}"
+          data-confirm="Delete this job and its files? This cannot be undone.">
+      <button class="button button-danger" type="submit">Delete job and files</button>
+    </form>
+    {% endif %}
+  </div>
+
+  <div class="details-grid">
+    <div class="panel">
+      <h3>Job</h3>
+      <dl class="kv">
+        <dt>Submitted</dt><dd>{{ job.created_at.strftime("%Y-%m-%d %H:%M:%S") }} UTC</dd>
+        <dt>Started</dt><dd>{{ job.started_at.strftime("%Y-%m-%d %H:%M:%S") if job.started_at else "–" }}</dd>
+        <dt>Finished</dt><dd>{{ job.finished_at.strftime("%Y-%m-%d %H:%M:%S") if job.finished_at else "–" }}</dd>
+        <dt>Expires</dt><dd>{{ job.expires_at.strftime("%Y-%m-%d %H:%M") }} UTC</dd>
+        {% if queue_position %}<dt>Queue position</dt><dd>{{ queue_position }}</dd>{% endif %}
+        <dt>Sequences</dt><dd>{{ job.seq_count }} ({{ "{:,}".format(job.total_residues) }} residues)</dd>
+        <dt>Attempts</dt><dd>{{ job.attempts }}</dd>
+        <dt>Worker</dt><dd class="mono">{{ job.locked_by or "–" }}</dd>
+        <dt>Last heartbeat</dt><dd>{{ job.heartbeat_at.strftime("%H:%M:%S") if job.heartbeat_at else "–" }}</dd>
+      </dl>
+    </div>
+    <div class="panel">
+      <h3>Submitter</h3>
+      <dl class="kv">
+        <dt>Email on file</dt><dd>{{ "yes, not sent yet" if job.email else "no" }}</dd>
+        <dt>Notified</dt><dd>{{ job.notified_at.strftime("%Y-%m-%d %H:%M") if job.notified_at else "–" }}</dd>
+        <dt>Client (hashed)</dt><dd class="mono">{{ job.client_ip_hash[:12] }}</dd>
+      </dl>
+    </div>
+    <div class="panel">
+      <h3>Output</h3>
+      <dl class="kv">
+        <dt>Error</dt><dd>{{ job.error_message or "–" }}</dd>
+        <dt>Order</dt><dd>{{ (job.concat_order or []) | step_labels or "–" }}</dd>
+        {% for name, version in (job.tool_versions or {}).items() %}<dt>{{ name }}</dt><dd class="mono">{{ version }}</dd>{% endfor %}
+        {% for warning in job.warnings %}<dt>Warning</dt><dd>{{ warning }}</dd>{% endfor %}
+      </dl>
+    </div>
+  </div>
+
+  <h2>Steps</h2>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th scope="col">Step</th><th scope="col">Status</th><th scope="col">Exit code</th><th scope="col">Time</th><th scope="col">stderr (last 4 KB)</th></tr></thead>
+      <tbody>
+        {% for step in job.steps %}
+        <tr>
+          <td>{{ labels.get(step.name, step.name) }}</td>
+          <td><span class="status status-{{ step.status.value }}">{{ step.status.value }}</span></td>
+          <td class="num">{{ step.exit_code if step.exit_code is not none else "–" }}</td>
+          <td class="num">{{ "%.1f s" % step.duration_seconds if step.duration_seconds is not none else "–" }}</td>
+          <td>{% if step.stderr_tail %}<details><summary>Show</summary><pre class="log">{{ step.stderr_tail }}</pre></details>{% else %}–{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
