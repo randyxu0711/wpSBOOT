@@ -42,7 +42,7 @@ each job are recorded and shown on its result page.
 
 ## Deploying
 
-See **[docs/deploy.md](docs/deploy.md)** (Traditional Chinese). In short:
+See **[docs/deploy.md](docs/deploy.md)** (Traditional Chinese). Project status and open decisions: [docs/PROGRESS.md](docs/PROGRESS.md). In short:
 
 ```sh
 cp .env.example .env        # set DOMAIN, SECRET_KEY, POSTGRES_PASSWORD, ADMIN_PASSWORD, SMTP_*
