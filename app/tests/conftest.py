@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 # Settings are read from the environment; set safe test values before anything imports them.
-os.environ.setdefault("SECRET_KEY", "test-secret")
+os.environ.setdefault("SECRET_KEY", "test-secret-key-0123456789")
 os.environ["DATA_DIR"] = tempfile.mkdtemp(prefix="wpsboot-test-data-")
 os.environ["SMTP_HOST"] = ""
 os.environ["ADMIN_USERNAME"] = "admin"

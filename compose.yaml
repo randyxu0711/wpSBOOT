@@ -1,4 +1,5 @@
-# Production stack. Configure through .env (copy .env.example), then: docker compose up -d
+# Production stack. Configure through .env (copy .env.example), then: docker compose up -d --build
+# Development adds compose.dev.yaml (see README).
 name: wpsboot
 
 x-app: &app
@@ -119,7 +120,7 @@ services:
     profiles: ["test"]
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-wpsboot}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/wpsboot_test
-      SECRET_KEY: test-secret
+      SECRET_KEY: test-secret-key-0123456789
     depends_on:
       db: { condition: service_healthy }
 

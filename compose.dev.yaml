@@ -1,5 +1,5 @@
-# Local development overrides, applied automatically by `docker compose up`.
-# For production use: docker compose -f compose.yaml up -d
+# Local development overrides. Enable with COMPOSE_FILE=compose.yaml:compose.dev.yaml in .env
+# (or pass both -f options). Production uses compose.yaml alone.
 services:
   db:
     ports:

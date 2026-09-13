@@ -2,6 +2,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -46,6 +47,13 @@ class Settings(BaseSettings):
     # Admin panel (disabled when admin_password is empty)
     admin_username: str = "admin"
     admin_password: str = "admin"  # noqa: S105  # default requested; warned about loudly
+
+    @field_validator("secret_key")
+    @classmethod
+    def _secret_key_is_set(cls, value: str) -> str:
+        if value == "change-me" or len(value) < 16:
+            raise ValueError("SECRET_KEY must be a random string of at least 16 characters")
+        return value
 
     @property
     def mail_enabled(self) -> bool:

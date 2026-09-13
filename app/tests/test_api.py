@@ -215,3 +215,11 @@ def test_jobs_listed_newest_first_in_db(client: TestClient, db: Session) -> None
     ids = [submit(client)["body"]["id"] for _ in range(3)]
     stored = db.scalars(select(Job.id).order_by(Job.created_at)).all()
     assert [str(i) for i in stored] == ids
+
+
+@pytest.mark.parametrize("key", ["change-me", "short"])
+def test_placeholder_secret_key_is_rejected(key: str, settings: Settings) -> None:
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError, match="SECRET_KEY"):
+        Settings.model_validate(settings.model_dump() | {"secret_key": key})
