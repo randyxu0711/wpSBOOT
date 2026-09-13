@@ -21,7 +21,6 @@
     var node = document.createElement(tag);
     Object.keys(attrs || {}).forEach(function (key) {
       if (key === "text") node.textContent = attrs[key];
-      else if (key === "style") node.style.cssText = attrs[key];
       else node.setAttribute(key, attrs[key]);
     });
     (children || []).forEach(function (child) { node.appendChild(child); });
@@ -42,8 +41,7 @@
   }
 
   function stepNode(step) {
-    var color = step.name === "concatenate" ? "var(--navy)" : "var(--c-" + step.name + ")";
-    return el("div", { class: "step", style: "--seg: " + color }, [
+    return el("div", { class: "step seg-" + step.name }, [
       el("span", { class: "name", text: step.label }),
       el("span", { class: "meta" }, [
         el("span", { text: duration(step.duration_seconds) }),
@@ -71,7 +69,7 @@
     alerts.forEach(function (alert) {
       var node = el("div", { class: "alert alert-" + alert[0] });
       if (Array.isArray(alert[1])) {
-        node.appendChild(el("strong", { text: "Check your input" }));
+        node.appendChild(el("strong", { text: "Notes about this job" }));
         node.appendChild(el("ul", {}, alert[1].map(function (w) { return el("li", { text: w }); })));
       } else {
         node.textContent = alert[1];
@@ -102,7 +100,7 @@
     $("order-section").hidden = !order.length;
     $("order-bar").textContent = "";
     order.forEach(function (name) {
-      $("order-bar").appendChild(el("span", { style: "--seg: var(--c-" + name + ")", text: LABELS[name] || name }));
+      $("order-bar").appendChild(el("span", { class: "seg-" + name, text: LABELS[name] || name }));
     });
 
     $("files-section").hidden = !job.files.length;

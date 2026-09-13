@@ -23,7 +23,7 @@ SessionDep = Annotated[Session, Depends(get_session)]
 SettingsDep = Annotated[Settings, Depends(get_app_settings)]
 
 
-@router.get("/", response_class=HTMLResponse)
+@router.api_route("/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 def index(request: Request, settings: SettingsDep) -> HTMLResponse:
     return templates.TemplateResponse(
         request,
@@ -42,7 +42,9 @@ def index(request: Request, settings: SettingsDep) -> HTMLResponse:
     )
 
 
-@router.get("/jobs/{job_id}", response_class=HTMLResponse, name="job_page")
+@router.api_route(
+    "/jobs/{job_id}", methods=["GET", "HEAD"], response_class=HTMLResponse, name="job_page"
+)
 def job_page(
     job_id: uuid.UUID, request: Request, session: SessionDep, settings: SettingsDep
 ) -> HTMLResponse:
@@ -59,7 +61,7 @@ def job_page(
     )
 
 
-@router.get("/healthz")
+@router.api_route("/healthz", methods=["GET", "HEAD"])
 def healthz(session: SessionDep) -> dict[str, str]:
     session.execute(text("SELECT 1"))
     return {"status": "ok"}

@@ -206,6 +206,8 @@ def test_pages_render(client: TestClient) -> None:
     assert page.status_code == 200
     assert job_id in page.text
     assert client.get("/healthz").json() == {"status": "ok"}
+    assert client.head("/").status_code == 200
+    assert client.head("/healthz").status_code == 200
     assert client.get("/api/openapi.json").status_code == 200
 
 

@@ -25,6 +25,13 @@
   --measure: 70ch;
 }
 
+/* Inline style attributes are blocked by the CSP, so aligner colours are classes. */
+.seg-mafft { --seg: var(--c-mafft); }
+.seg-muscle { --seg: var(--c-muscle); }
+.seg-clustalw { --seg: var(--c-clustalw); }
+.seg-tcoffee { --seg: var(--c-tcoffee); }
+.seg-concatenate { --seg: var(--navy); }
+
 *,
 *::before,
 *::after { box-sizing: border-box; }
@@ -107,7 +114,7 @@ code, pre, textarea.sequences { font-family: var(--mono); }
   .segment:nth-child(2) { animation-delay: 90ms; }
   .segment:nth-child(3) { animation-delay: 180ms; }
   .segment:nth-child(4) { animation-delay: 270ms; }
-  @keyframes join { from { opacity: 0; transform: translateX(calc(var(--i, 1) * 24px)); } }
+  @keyframes join { from { opacity: 0; transform: translateX(24px); } }
 }
 
 /* ---------- buttons ---------- */

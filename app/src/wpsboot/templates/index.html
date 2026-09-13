@@ -19,7 +19,7 @@
     <figure class="supermsa">
       <div class="supermsa-rows">
         {% for segment in hero_segments %}
-        <div class="segment" style="--seg: var(--c-{{ segment.id }}); --i: {{ loop.index }}">
+        <div class="segment seg-{{ segment.id }}">
           <span class="seg-name">{{ segment.label }}</span>
           <pre>{% for row in segment.rows %}{% for ch in row %}{% if ch == '-' %}<span class="gap">-</span>{% else %}{{ ch }}{% endif %}{% endfor %}
 {% endfor %}</pre>
@@ -78,7 +78,7 @@
             <ul class="aligner-list">
               {% for aligner in aligners %}
               <li>
-                <label class="aligner-option" style="--seg: var(--c-{{ aligner.id }})">
+                <label class="aligner-option seg-{{ aligner.id }}">
                   <input type="checkbox" name="aligners" value="{{ aligner.id }}" checked>
                   <span class="name">{{ aligner.label }}</span>
                 </label>
