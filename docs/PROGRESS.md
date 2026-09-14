@@ -5,7 +5,7 @@
 ## 目前狀態
 
 - 2019 年的 Flask 版已重寫為 v2：FastAPI + Postgres（資料庫兼 job queue）+ worker + Caddy，並用 docker compose 管理。
-- 開發在 `v2` branch 上，**尚未 push，也尚未 merge 回 master**。舊版保留在 tag `v1-legacy`。
+- 2026-09-14 已 push 並 fast-forward merge 回 master，GitHub Actions CI 在 `v2` 與 `master` 都通過。之後繼續在 `v2` 開發。舊版保留在 tag `v1-legacy`（已 push）。
 - 原訂計畫的里程碑 M0–M5 全部完成：
   - 工具鏈 image
   - 資料庫 / FASTA 驗證
@@ -55,8 +55,6 @@
 ## 還沒驗證
 
 - 正式環境的反向代理後面，app 看到的是否是使用者的真實 IP（本機 dev 模式全部顯示為 Docker gateway，會讓所有人共用 rate limit 額度）
-
-- GitHub Actions CI 還沒實際跑過（要 push 之後才會跑）
 - 真實寄信服務（只測過 Mailpit）
 - 真實網域的 Let's Encrypt 憑證（只測過 localhost）
 - 在實際環境直接 kill worker container 後 job 是否被接手（只在測試中驗證）
@@ -64,21 +62,20 @@
 
 ## 待討論
 
-1. **通知信功能**（下次優先討論）
-   - 要不要保留這個功能？要的話 email 維持選填嗎？
-   - 用哪種寄信方式：交易型寄信服務（Resend / Brevo / Mailgun / SES）、學校或系上的 SMTP relay，或其他。不建議自架 Postfix，也不建議用 Gmail。
-   - 寄件網域與 SPF/DKIM 的設定由誰負責
-   - 目前的做法：Python `smtplib` 透過標準 SMTP 寄出，相關設定都在 `.env` 的 `SMTP_*`；`SMTP_HOST` 留空就不寄信（網頁上的 email 欄位會自動隱藏）；寄完後會從資料庫刪除 email 地址
-2. 是否要加 `./setup.sh`，互動式產生 `.env`（先不急）
-3. 部署主機與網域
-4. 跟實驗室確認聯絡資訊，以及是否要加 LICENSE
+目前沒有上線計畫，以下都等到要用時再決定：
 
-## 待辦（使用者）
+1. **通知信**：程式保留、預設關閉。要啟用時先問系上有沒有 SMTP relay，沒有再考慮 Resend / Brevo 等交易型寄信服務（不建議 Gmail 或自架 Postfix）。設定都在 `.env` 的 `SMTP_*`。
+2. 部署主機與網域（部署指令已寫在 README，會自動產生隨機密鑰與 admin 密碼）
+3. 跟實驗室確認聯絡資訊，以及是否要加 LICENSE
+4. 資料庫改用非 superuser 角色（見「安全審查」）
 
-- [ ] 舊的 Gmail 帳號 `wpsboot@gmail.com` 改密碼或停用（密碼留在公開的 git history 裡）
-- [ ] 本機測試各項功能
-- [ ] 上線前把 `ADMIN_PASSWORD` 改掉
-- [ ] 確認沒問題後，merge `v2` 回 master 並 push
+已決定不做：`./setup.sh`（README 的複製貼上指令已涵蓋）、舊 Gmail 帳號 `wpsboot@gmail.com` 不處理（當作歷史遺跡）。
+
+## 待辦
+
+- [x] 本機測試各項功能（sample、後台）
+- [x] merge `v2` 回 master 並 push，CI 通過
+- [ ] 真的要上線時：確認 `ADMIN_PASSWORD` 不是預設值、確認拿得到使用者真實 IP
 
 ## 本機操作速查
 
