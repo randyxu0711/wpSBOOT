@@ -2,6 +2,8 @@
 
 Web server for building **Super-MSAs** for Weighted Partial Super Bootstrap (wpSBOOT).
 
+![wpSBOOT home page on a desktop browser and a finished job's result page on a phone](docs/img/wpsboot-hero.webp)
+
 ## About wpSBOOT
 
 > We demonstrate that incorporating MSA induced uncertainty into bootstrap sampling can
