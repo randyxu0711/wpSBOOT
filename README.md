@@ -254,4 +254,4 @@ Project status and open decisions: [docs/PROGRESS.md](docs/PROGRESS.md).
 ## Contact
 
 Dr. Jia-Ming Chang, Department of Computer Science, National Chengchi University —
-chang.jiaming@gmail.com — http://www.changlabtw.com/
+chang.jiaming@gmail.com — [http://www.changlabtw.com/](https://changlabtw.github.io/lab/)
