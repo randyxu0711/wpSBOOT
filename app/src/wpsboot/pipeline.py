@@ -33,6 +33,8 @@ WORK_DIR = "work"
 STDERR_TAIL_BYTES = 4096
 KILL_GRACE_SECONDS = 5.0
 POLL_SECONDS = 0.2
+# The only worker environment variables the tools see; the rest (database URL, passwords) stays out.
+INHERITED_ENV = ("PATH", "LANG", "LC_ALL", "TZ")
 
 
 @dataclass(frozen=True)
@@ -224,7 +226,8 @@ def _spawn(
     hooks: Hooks,
 ) -> _Proc:
     # HOME and the T-Coffee dirs point at the scratch dir so concurrent runs never share state.
-    env = os.environ | {
+    inherited = {key: os.environ[key] for key in INHERITED_ENV if key in os.environ}
+    env = inherited | {
         "HOME": str(work_dir),
         "HOME_4_TCOFFEE": str(work_dir),
         "TMP_4_TCOFFEE": str(work_dir),

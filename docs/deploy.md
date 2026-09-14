@@ -61,7 +61,7 @@ MAIL_FROM="wpSBOOT <noreply@wpsboot.example.org>"
 
 寄件網域要設定 SPF 與 DKIM（依寄信服務的說明新增 DNS 紀錄），否則信件很容易被當成垃圾信。
 
-**容量與上限**：`WORKER_REPLICAS`、`WORKER_CPUS`、`WORKER_MEMORY`、`MAX_SEQUENCES`、`JOB_TIMEOUT_SECONDS`、`RETENTION_DAYS`、`RATE_LIMIT_PER_HOUR` 等，預設值見 `.env.example`。每個 worker 一次處理一個 job，job 內的 aligner 會平行執行，所以 `WORKER_REPLICAS × WORKER_CPUS` 不應超過主機的 CPU 數。
+**容量與上限**：`WORKER_REPLICAS`、`WORKER_CPUS`、`WORKER_MEMORY`、`MAX_SEQUENCES`、`JOB_TIMEOUT_SECONDS`、`RETENTION_DAYS`、`RATE_LIMIT_PER_HOUR`、`MAX_ACTIVE_JOBS_PER_IP` 等，預設值見 `.env.example`。每個 worker 一次處理一個 job，job 內的 aligner 會平行執行，所以 `WORKER_REPLICAS × WORKER_CPUS` 不應超過主機的 CPU 數。
 
 > ⚠️ 正式主機的 `.env` **不要**設定 `COMPOSE_FILE`。那是本機開發用的，會啟用 hot reload 並開放不必要的 port。
 

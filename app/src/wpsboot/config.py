@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     max_sequence_length: int = 10_000
     max_upload_bytes: int = 2 * 1024 * 1024
     rate_limit_per_hour: int = 10
+    max_active_jobs_per_ip: int = 2
 
     # Job lifecycle
     job_timeout_seconds: int = 1800

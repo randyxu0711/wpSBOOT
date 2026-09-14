@@ -1,6 +1,7 @@
 """Parse, validate and normalise user-submitted FASTA before it reaches the aligners."""
 
 import re
+import unicodedata
 from dataclasses import dataclass, field
 
 # BioPerl's PHYLIP writer truncates sequence names to this many characters.
@@ -53,6 +54,9 @@ def parse_fasta(text: str, *, max_sequences: int, max_sequence_length: int) -> P
     seen: set[str] = set()
     gaps_removed = False
     for index, (header, seq_lines) in enumerate(raw, start=1):
+        if any(unicodedata.category(c) == "Cc" and c != "\t" for c in header):
+            errors.append(f"Sequence #{index} contains control characters in its header line.")
+            header = "".join(c for c in header if unicodedata.category(c) != "Cc" or c == "\t")
         name = header.split()[0] if header.split() else ""
         label = f"'{name}'" if name else f"#{index}"
         if not name:

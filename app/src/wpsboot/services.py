@@ -2,6 +2,7 @@
 
 import hashlib
 import hmac
+import ipaddress
 import logging
 import shutil
 import uuid
@@ -29,6 +30,12 @@ class RateLimitedError(Exception):
         self.retry_after_seconds = retry_after_seconds
 
 
+class TooManyActiveJobsError(Exception):
+    def __init__(self, limit: int) -> None:
+        super().__init__("too many active jobs")
+        self.limit = limit
+
+
 class InvalidTransitionError(Exception):
     pass
 
@@ -42,7 +49,17 @@ def job_dir(settings: Settings, job_id: uuid.UUID) -> Path:
 
 
 def hash_ip(settings: Settings, ip: str) -> str:
-    return hmac.new(settings.secret_key.encode(), ip.encode(), hashlib.sha256).hexdigest()
+    try:
+        address = ipaddress.ip_address(ip)
+    except ValueError:
+        key = ip
+    else:
+        if isinstance(address, ipaddress.IPv6Address) and address.ipv4_mapped:
+            address = address.ipv4_mapped
+        # One IPv6 subscriber usually holds a whole /64, so count it as one client.
+        prefix = 64 if address.version == 6 else 32
+        key = str(ipaddress.ip_network(f"{address}/{prefix}", strict=False))
+    return hmac.new(settings.secret_key.encode(), key.encode(), hashlib.sha256).hexdigest()
 
 
 # --- creation -------------------------------------------------------------------------------
@@ -59,6 +76,17 @@ def check_rate_limit(session: Session, settings: Settings, ip_hash: str) -> None
         oldest = created[len(created) - settings.rate_limit_per_hour]
         retry_after = int((oldest + timedelta(hours=1) - now()).total_seconds()) + 1
         raise RateLimitedError(max(retry_after, 1))
+    # Keeps one address from occupying every worker with long jobs.
+    active = session.scalar(
+        select(func.count())
+        .select_from(Job)
+        .where(
+            Job.client_ip_hash == ip_hash,
+            Job.status.in_([JobStatus.QUEUED, JobStatus.RUNNING]),
+        )
+    )
+    if (active or 0) >= settings.max_active_jobs_per_ip:
+        raise TooManyActiveJobsError(settings.max_active_jobs_per_ip)
 
 
 def create_job(

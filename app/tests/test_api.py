@@ -102,6 +102,21 @@ def test_rate_limit(
     assert 0 < int(limited["headers"]["retry-after"]) <= 3601
 
 
+def test_active_job_limit(
+    client: TestClient, db: Session, settings: Settings, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(settings, "max_active_jobs_per_ip", 2)
+    first = submit(client)["body"]["id"]
+    assert submit(client)["status"] == 201
+    limited = submit(client)
+    assert limited["status"] == 429
+    assert any("2 jobs queued or running" in e for e in limited["body"]["errors"])
+
+    db.get_one(Job, uuid.UUID(first)).status = JobStatus.SUCCEEDED
+    db.commit()
+    assert submit(client)["status"] == 201
+
+
 def test_get_job_and_queue_position(client: TestClient) -> None:
     first = submit(client)["body"]["id"]
     second = submit(client)["body"]["id"]

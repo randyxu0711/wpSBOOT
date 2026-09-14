@@ -91,7 +91,9 @@ def submit_job(
     response: Response,
     session: SessionDep,
     settings: SettingsDep,
-    sequences: Annotated[str | None, Form(description="FASTA text")] = None,
+    sequences: Annotated[
+        str | None, Form(description="FASTA text (at most 1 MB; send larger input as `file`)")
+    ] = None,
     file: Annotated[UploadFile | None, File(description="FASTA file")] = None,
     aligners: Annotated[
         list[str] | None,
@@ -135,6 +137,14 @@ def submit_job(
             429,
             [f"Too many jobs from your address. Try again in {minutes} min."],
             headers={"Retry-After": str(exc.retry_after_seconds)},
+        ) from exc
+    except svc.TooManyActiveJobsError as exc:
+        raise ApiError(
+            429,
+            [
+                f"You already have {exc.limit} jobs queued or running. "
+                "Submit again when one of them has finished."
+            ],
         ) from exc
 
     status_url = str(request.url_for("get_job", job_id=job.id))

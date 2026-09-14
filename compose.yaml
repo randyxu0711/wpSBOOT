@@ -10,6 +10,8 @@ x-app: &app
   volumes:
     - jobdata:/data/jobs
   restart: unless-stopped
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
   logging:
     driver: json-file
     options: { max-size: "10m", max-file: "5" }
@@ -61,7 +63,7 @@ services:
     deploy:
       replicas: ${WORKER_REPLICAS:-2}
       resources:
-        limits: { cpus: "${WORKER_CPUS:-2}", memory: "${WORKER_MEMORY:-4g}" }
+        limits: { cpus: "${WORKER_CPUS:-2}", memory: "${WORKER_MEMORY:-4g}", pids: 512 }
     stop_grace_period: 30s
     healthcheck:
       test: ["CMD", "python", "-c", "import os, sys, time; sys.exit(time.time() - os.path.getmtime('/tmp/wpsboot-worker-alive') > 60)"]

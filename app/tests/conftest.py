@@ -14,11 +14,14 @@ os.environ["SMTP_HOST"] = ""
 os.environ["ADMIN_USERNAME"] = "admin"
 os.environ["ADMIN_PASSWORD"] = "admin"
 os.environ["CONCATENATE_SCRIPT"] = str(Path(__file__).parent / "fakes" / "concatenate.pl")
+# Many tests submit several jobs from one address; test_active_job_limit lowers this again.
+os.environ["MAX_ACTIVE_JOBS_PER_IP"] = "1000"
 
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
 
+from wpsboot import pipeline
 from wpsboot.config import Settings, get_settings
 from wpsboot.db import get_sessionmaker
 from wpsboot.main import create_app
@@ -88,10 +91,13 @@ def fake_tools(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Put fake aligners first on PATH. Behaviour per tool via FAKE_<NAME>=ok|fail|empty|hang."""
     bin_dir = tmp_path / "fake-bin"
     bin_dir.mkdir()
-    for name in ("mafft", "muscle", "clustalw", "t_coffee"):
+    names = ("mafft", "muscle", "clustalw", "t_coffee")
+    for name in names:
         exe = bin_dir / name
         shutil.copyfile(FAKES / "aligner.sh", exe)
         exe.chmod(exe.stat().st_mode | stat.S_IEXEC)
         monkeypatch.setenv(f"FAKE_{name.upper()}", "ok")
+    fake_env = tuple(f"FAKE_{name.upper()}" for name in names)
+    monkeypatch.setattr(pipeline, "INHERITED_ENV", (*pipeline.INHERITED_ENV, *fake_env))
     monkeypatch.setenv("PATH", f"{bin_dir}{os.pathsep}{os.environ['PATH']}")
     return bin_dir

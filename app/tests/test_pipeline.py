@@ -80,6 +80,16 @@ def test_failures_and_empty_output(
     assert not (job_dir / "muscle.fasta").exists()
 
 
+def test_aligners_do_not_inherit_secrets(
+    fake_tools: Path, job_dir: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("FAKE_MAFFT", "env")
+    monkeypatch.setenv("POSTGRES_PASSWORD", "hunter2-secret")
+    tail = run(job_dir, ["mafft"])["mafft"].stderr_tail
+    assert "PATH=" in tail
+    assert "hunter2-secret" not in tail
+
+
 def test_deadline_kills_only_slow_aligners(
     fake_tools: Path, job_dir: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

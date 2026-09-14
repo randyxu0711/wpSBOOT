@@ -44,6 +44,8 @@ def test_long_sequences_are_wrapped() -> None:
         (">a\nACGT\n>\nAC\n", "#2 has no name"),
         (">a\nACGT\n>b\n\n", "'b' is empty"),
         (">a\nAC1GT\n>b\nAC\n", "invalid characters: 1"),
+        (">a\x00(b\nACGT\n>c\nAC\n", "#1 contains control characters"),
+        (">a\nACGT\n>b desc\x1b[31m\nAC\n", "#2 contains control characters"),
     ],
 )
 def test_invalid_input(text: str, expected: str) -> None:
@@ -77,6 +79,11 @@ def test_names_colliding_after_phylip_truncation_are_rejected() -> None:
 def test_long_but_unique_names_warn() -> None:
     parsed = parse(">alpha_long_name\nAC\n>beta_long_name\nAC\n")
     assert any("truncated" in w for w in parsed.warnings)
+
+
+def test_tab_in_description_is_allowed() -> None:
+    parsed = parse(">a\tfrom species X\nAC\n>b\nAC\n")
+    assert parsed.records[0].name == "a"
 
 
 def test_risky_characters_warn() -> None:

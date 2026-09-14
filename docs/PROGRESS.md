@@ -1,6 +1,6 @@
 # wpSBOOT v2 進度紀錄
 
-最後更新：2026-09-13
+最後更新：2026-09-14
 
 ## 目前狀態
 
@@ -13,7 +13,8 @@
   - API 與 `/admin`
   - 一頁式 RWD 前端
   - 正式部署設定、CI、部署手冊
-- 66 個測試全部通過，其中包含在 container 裡實際執行 4 個 aligner 和 `concatenate.pl`。
+- 74 個測試全部通過，其中包含在 container 裡實際執行 4 個 aligner 和 `concatenate.pl`。
+- 2026-09-14 做過一次安全審查並修正（見下方「安全審查」）。目前沒有上線計畫，防護做到合理程度即可。
 
 ## 已定案的決策
 
@@ -23,7 +24,7 @@
 | 實驗室工具 | `tools/concatenate.pl` **原封不動**，裝 BioPerl 後直接呼叫 |
 | Aligner | MAFFT 7.525、MUSCLE 3.8.1551、ClustalW 2.1、T-Coffee 11.00、BioPerl 1.7.8（bioconda），指令參數沿用舊版 `wpSBOOT.sh` |
 | 身分 | 免登入，結果網址用 UUID，最近的 job 記在瀏覽器 localStorage |
-| 上限 | 200 條序列、單條 10,000、2 MB、job 30 分鐘、每 IP 每小時 10 個、保留 14 天，全部可用 `.env` 調整 |
+| 上限 | 200 條序列、單條 10,000、2 MB、job 30 分鐘、每 IP 每小時 10 個、每 IP 同時最多 2 個排隊或執行中（IPv6 以 /64 計）、保留 14 天，全部可用 `.env` 調整 |
 | 序列名稱 | PHYLIP 會截成 10 字元（已實測）：截斷後撞名就擋下，只截斷或含特殊字元則警告 |
 | 後台 | `/admin` 用 HTTP Basic，預設帳密 admin/admin（依需求設定；UI 與 log 都會警告） |
 | 前端 | Jinja2 + vanilla JS，不用 SPA；沿用 #003752 / #8fcc52 與 logo |
@@ -36,7 +37,24 @@
 - 備份與還原：照 `docs/deploy.md` 的指令實際操作過，資料筆數還原前後一致
 - 瀏覽器截圖檢查桌機（1280px）與手機（390px），畫面沒有橫向捲動
 
+## 安全審查（2026-09-14）
+
+沒有發現問題：command injection（不經 shell）、路徑穿越、SQL injection、XSS、CSRF、email header injection。
+
+已修正：
+- 每個 IP 同時排隊或執行中的 job 上限（`MAX_ACTIVE_JOBS_PER_IP`，預設 2），IPv6 以 /64 計算，避免一個人佔滿所有 worker
+- aligner 只繼承 `PATH`、`LANG`、`LC_ALL`、`TZ`，拿不到資料庫與後台密碼
+- 序列 header 含控制字元時回 422（原本 NUL 字元會造成 500）
+- 前端把貼上的序列以檔案形式送出（表單欄位原本被框架限制在 1 MB）
+- web / worker 加上 `cap_drop: ALL`、`no-new-privileges`，worker 限制 512 個 process
+
+刻意不做：
+- 資料庫改用非 superuser 角色（攻擊前提是 aligner 被攻破，且沒有上線計畫）
+- 後台登入失敗次數限制、持有結果網址即可刪除 job（屬於設計取捨）
+
 ## 還沒驗證
+
+- 正式環境的反向代理後面，app 看到的是否是使用者的真實 IP（本機 dev 模式全部顯示為 Docker gateway，會讓所有人共用 rate limit 額度）
 
 - GitHub Actions CI 還沒實際跑過（要 push 之後才會跑）
 - 真實寄信服務（只測過 Mailpit）

@@ -87,6 +87,9 @@
   function clientErrors() {
     var problems = [];
     if (mode === "paste" && !textarea.value.trim()) problems.push("Paste your sequences, or switch to Upload a file.");
+    if (mode === "paste" && new Blob([textarea.value]).size > maxBytes) {
+      problems.push("The pasted sequences are larger than " + maxBytes / 1048576 + " MB.");
+    }
     if (mode === "upload" && !fileInput.files.length) problems.push("Choose a FASTA file to upload.");
     if (mode === "upload" && fileInput.files.length && fileInput.files[0].size > maxBytes) {
       problems.push("The file is larger than " + maxBytes / 1048576 + " MB.");
@@ -102,7 +105,11 @@
     if (problems.length) return showErrors(problems);
 
     var data = new FormData(form);
-    if (mode === "paste") data.delete("file"); else data.delete("sequences");
+    data.delete("sequences");
+    if (mode === "paste") {
+      // Sent as a file part: plain form fields are capped at 1 MB by the server's form parser.
+      data.set("file", new Blob([textarea.value], { type: "text/plain" }), "pasted.fasta");
+    }
 
     errors.hidden = true;
     button.disabled = true;
