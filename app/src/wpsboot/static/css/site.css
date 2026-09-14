@@ -110,11 +110,15 @@ code, pre, textarea.sequences { font-family: var(--mono); }
 .segment .seg-name { display: block; margin-bottom: 4px; font: 600 12px/1.2 var(--sans); color: var(--seg); }
 .supermsa figcaption { margin-top: 10px; font-size: 14px; color: #a9c3cf; max-width: 46ch; }
 @media (prefers-reduced-motion: no-preference) {
-  .segment { animation: join 700ms cubic-bezier(.2, .7, .2, 1) both; }
-  .segment:nth-child(2) { animation-delay: 90ms; }
-  .segment:nth-child(3) { animation-delay: 180ms; }
-  .segment:nth-child(4) { animation-delay: 270ms; }
-  @keyframes join { from { opacity: 0; transform: translateX(24px); } }
+  /* Only the contents slide, clipped by their segment, so the strip never overflows and
+     flashes a scrollbar while animating. */
+  .segment { overflow: hidden; animation: join-fade 700ms cubic-bezier(.2, .7, .2, 1) both; }
+  .segment > * { animation: join-slide 700ms cubic-bezier(.2, .7, .2, 1) both; }
+  .segment:nth-child(2), .segment:nth-child(2) > * { animation-delay: 90ms; }
+  .segment:nth-child(3), .segment:nth-child(3) > * { animation-delay: 180ms; }
+  .segment:nth-child(4), .segment:nth-child(4) > * { animation-delay: 270ms; }
+  @keyframes join-fade { from { opacity: 0; } }
+  @keyframes join-slide { from { transform: translateX(24px); } }
 }
 
 /* ---------- buttons ---------- */
