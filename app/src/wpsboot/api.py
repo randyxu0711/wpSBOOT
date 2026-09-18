@@ -1,9 +1,9 @@
 """Public JSON API (/api/v1). The web frontend uses the same endpoints."""
 
+import math
 import tempfile
 import uuid
 import zipfile
-import math
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Any
