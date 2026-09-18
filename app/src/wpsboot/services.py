@@ -66,6 +66,8 @@ def hash_ip(settings: Settings, ip: str) -> str:
 
 
 def check_rate_limit(session: Session, settings: Settings, ip_hash: str) -> None:
+    # Serialise submissions per address so concurrent requests can't all pass the count.
+    session.execute(select(func.pg_advisory_xact_lock(func.hashtext(ip_hash))))
     window_start = now() - timedelta(hours=1)
     created = session.scalars(
         select(Job.created_at)

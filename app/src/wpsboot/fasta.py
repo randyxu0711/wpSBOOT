@@ -48,7 +48,7 @@ def parse_fasta(text: str, *, max_sequences: int, max_sequence_length: int) -> P
     """Parse FASTA text. Raises FastaError listing every problem found (capped)."""
     errors: list[str] = []
     warnings: list[str] = []
-    raw = _split_records(text.lstrip("﻿"), errors)
+    raw = _split_records(text.lstrip("\ufeff"), errors)
 
     records: list[Record] = []
     seen: set[str] = set()
