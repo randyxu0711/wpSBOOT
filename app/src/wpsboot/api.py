@@ -3,6 +3,7 @@
 import tempfile
 import uuid
 import zipfile
+import math
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Any
@@ -132,7 +133,7 @@ def submit_job(
             warnings=warnings,
         )
     except svc.RateLimitedError as exc:
-        minutes = exc.retry_after_seconds // 60 + 1
+        minutes = math.ceil(exc.retry_after_seconds / 60)
         raise ApiError(
             429,
             [f"Too many jobs from your address. Try again in {minutes} min."],
