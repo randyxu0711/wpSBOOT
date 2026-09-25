@@ -9,6 +9,7 @@ x-app: &app
     DATA_DIR: /data/jobs
   volumes:
     - jobdata:/data/jobs
+  networks: [backend]
   restart: unless-stopped
   cap_drop: [ALL]
   security_opt: ["no-new-privileges:true"]
@@ -25,6 +26,11 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-wpsboot}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks: [backend]
+    security_opt: ["no-new-privileges:true"]
+    deploy:
+      resources:
+        limits: { memory: "${POSTGRES_MEMORY:-2g}" }
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -45,6 +51,7 @@ services:
     <<: *app
     image: wpsboot-web:${WPSBOOT_VERSION:-latest}
     build: { context: ., dockerfile: docker/Dockerfile, target: web }
+    networks: [frontend, backend]  # the only service on both: Caddy reaches it, it reaches the db
     depends_on:
       migrate: { condition: service_completed_successfully }
     healthcheck:
@@ -84,6 +91,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+    networks: [frontend]
     depends_on:
       web: { condition: service_healthy }
     restart: unless-stopped
@@ -98,6 +106,7 @@ services:
       BACKUP_KEEP: ${BACKUP_KEEP:-7}
     volumes:
       - backups:/backups
+    networks: [backend]
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
@@ -123,8 +132,16 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-wpsboot}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/wpsboot_test
       SECRET_KEY: test-secret-key-0123456789
+    networks: [backend]
     depends_on:
       db: { condition: service_healthy }
+
+# Caddy is the only service on frontend, the database only on backend: a compromised proxy
+# cannot reach Postgres. Add `internal: true` to backend once no service needs outbound
+# network access (the worker does while SMTP_HOST points at an external mail server).
+networks:
+  frontend:
+  backend:
 
 volumes:
   pgdata:
